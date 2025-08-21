@@ -28,6 +28,10 @@ class EnvironmentVariablesValidator {
   @IsOptional()
   APP_PORT: number;
 
+  @IsString()
+  @IsOptional()
+  APP_HOST: string;
+
   @IsUrl({ require_tld: false })
   @IsOptional()
   FRONTEND_DOMAIN: string;
@@ -63,6 +67,7 @@ export default registerAs<AppConfig>('app', () => {
       : process.env.PORT
         ? parseInt(process.env.PORT, 10)
         : 3000,
+    host: process.env.APP_HOST || 'localhost',
     apiPrefix: process.env.API_PREFIX || 'api',
     fallbackLanguage: process.env.APP_FALLBACK_LANGUAGE || 'en',
     headerLanguage: process.env.APP_HEADER_LANGUAGE || 'x-custom-lang',
