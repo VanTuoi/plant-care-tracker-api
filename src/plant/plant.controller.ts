@@ -1,4 +1,3 @@
-// plant.controller.ts
 import {
   BadRequestException,
   Controller,
