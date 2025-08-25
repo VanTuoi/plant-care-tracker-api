@@ -2,16 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { I18nContext } from 'nestjs-i18n';
 import { MailData } from './interfaces/mail-data.interface';
-
 import { MaybeType } from '../utils/types/maybe.type';
-import { MailerService } from '../mailer/mailer.service';
 import path from 'path';
 import { AllConfigType } from '../config/config.type';
+import { NotifierService } from '../notifier/application/services/notifier.service';
 
 @Injectable()
 export class MailService {
   constructor(
-    private readonly mailerService: MailerService,
+    private readonly notifier: NotifierService,
     private readonly configService: ConfigService<AllConfigType>,
   ) {}
 
@@ -32,13 +31,12 @@ export class MailService {
     }
 
     const url = new URL(
-      this.configService.getOrThrow('app.frontendDomain', {
-        infer: true,
-      }) + '/confirm-email',
+      this.configService.getOrThrow('app.frontendDomain', { infer: true }) +
+        '/confirm-email',
     );
     url.searchParams.set('hash', mailData.data.hash);
 
-    await this.mailerService.sendMail({
+    await this.notifier.notifyUserByEmail({
       to: mailData.to,
       subject: emailConfirmTitle,
       text: `${url.toString()} ${emailConfirmTitle}`,
@@ -84,14 +82,13 @@ export class MailService {
     }
 
     const url = new URL(
-      this.configService.getOrThrow('app.frontendDomain', {
-        infer: true,
-      }) + '/password-change',
+      this.configService.getOrThrow('app.frontendDomain', { infer: true }) +
+        '/password-change',
     );
     url.searchParams.set('hash', mailData.data.hash);
     url.searchParams.set('expires', mailData.data.tokenExpires.toString());
 
-    await this.mailerService.sendMail({
+    await this.notifier.notifyUserByEmail({
       to: mailData.to,
       subject: resetPasswordTitle,
       text: `${url.toString()} ${resetPasswordTitle}`,
@@ -152,13 +149,12 @@ export class MailService {
     }
 
     const url = new URL(
-      this.configService.getOrThrow('app.frontendDomain', {
-        infer: true,
-      }) + '/confirm-new-email',
+      this.configService.getOrThrow('app.frontendDomain', { infer: true }) +
+        '/confirm-new-email',
     );
     url.searchParams.set('hash', mailData.data.hash);
 
-    await this.mailerService.sendMail({
+    await this.notifier.notifyUserByEmail({
       to: mailData.to,
       subject: emailConfirmTitle,
       text: `${url.toString()} ${emailConfirmTitle}`,
@@ -179,6 +175,31 @@ export class MailService {
         text1,
         text2,
         text3,
+      },
+    });
+  }
+
+  async plantWateringReminder(): Promise<void> {
+    const subject = `⏰ Nhắc tưới cây: Cam`;
+    const text = `Đã đến lúc tưới cây Cam! Lịch hẹn: 8h`;
+
+    await this.notifier.notifyUserByEmail({
+      to: 'john.doe@example.com',
+      subject,
+      text,
+      templatePath: path.join(
+        this.configService.getOrThrow('app.workingDirectory', { infer: true }),
+        'src',
+        'mail',
+        'mail-templates',
+        'plant-watering.hbs',
+      ),
+      context: {
+        title: subject,
+        plantName: 'Cam',
+        schedule: '8h',
+        actionTitle: 'Tưới ngay',
+        app_name: this.configService.get('app.name', { infer: true }),
       },
     });
   }

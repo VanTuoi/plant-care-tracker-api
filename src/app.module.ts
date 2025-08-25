@@ -19,8 +19,8 @@ import { HomeModule } from './home/home.module';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
-import { MailerModule } from './mailer/mailer.module';
-import { NotificationModule } from './notification/notification.module';
+import { NotifierModule } from './notifier/notifier.module';
+import { CalendarReminderModule } from './calendar-reminder/calendar-reminder.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -69,13 +69,13 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     }),
     UsersModule,
     FilesModule,
-    NotificationModule,
     AuthModule,
     AuthGoogleModule,
     SessionModule,
     MailModule,
-    MailerModule,
+    NotifierModule,
     HomeModule,
+    CalendarReminderModule,
   ],
 })
 export class AppModule {}
