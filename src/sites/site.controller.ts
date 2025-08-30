@@ -11,6 +11,7 @@ import {
   HttpStatus,
   HttpCode,
   SerializeOptions,
+  Req,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -36,7 +37,7 @@ import {
   InfinityPaginationResponseDto,
 } from '../utils/dto/infinity-pagination-response.dto';
 import { infinityPagination } from '../utils/infinity-pagination';
-import { NullableType } from '../utils/types/nullable.type';
+import { JwtPayloadType } from '../common/types/jwt-payload.type';
 
 @ApiBearerAuth()
 @Roles(RoleEnum.admin, RoleEnum.user)
@@ -57,8 +58,8 @@ export class SitesController {
   })
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createSiteDto: CreateSiteDto): Promise<Site> {
-    return this.sitesService.create(createSiteDto);
+  create(@Body() dto: CreateSiteDto, @Req() req): Promise<Site> {
+    return this.sitesService.create(dto, req.user as JwtPayloadType);
   }
 
   @ApiOkResponse({
@@ -71,6 +72,7 @@ export class SitesController {
   @HttpCode(HttpStatus.OK)
   async findAll(
     @Query() query: QuerySiteDto,
+    @Req() req,
   ): Promise<InfinityPaginationResponseDto<Site>> {
     const page = query?.page ?? 1;
     let limit = query?.limit ?? 10;
@@ -86,6 +88,7 @@ export class SitesController {
           page,
           limit,
         },
+        jwt: req.user as JwtPayloadType,
       }),
       { page, limit },
     );
@@ -104,8 +107,8 @@ export class SitesController {
     type: String,
     required: true,
   })
-  findOne(@Param('id') id: Site['id']): Promise<NullableType<Site>> {
-    return this.sitesService.findById(id);
+  findOne(@Param('id') id: Site['id'], @Req() req) {
+    return this.sitesService.findById(id, req.user as JwtPayloadType);
   }
 
   @ApiOkResponse({
@@ -124,8 +127,13 @@ export class SitesController {
   update(
     @Param('id') id: Site['id'],
     @Body() updateSiteDto: UpdateSiteDto,
+    @Req() req,
   ): Promise<Site | null> {
-    return this.sitesService.update(id, updateSiteDto);
+    return this.sitesService.update(
+      id,
+      updateSiteDto,
+      req.user as JwtPayloadType,
+    );
   }
 
   @Delete(':id')
@@ -135,7 +143,7 @@ export class SitesController {
     required: true,
   })
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: Site['id']): Promise<void> {
-    return this.sitesService.remove(id);
+  remove(@Param('id') id: Site['id'], @Req() req): Promise<void> {
+    return this.sitesService.remove(id, req.user as JwtPayloadType);
   }
 }

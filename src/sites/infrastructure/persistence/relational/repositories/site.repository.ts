@@ -40,6 +40,14 @@ export class SitesRelationalRepository implements SiteRepository {
       where.name = filterOptions.name;
     }
 
+    if (filterOptions?.description) {
+      where.description = filterOptions.description;
+    }
+
+    if (filterOptions?.userId) {
+      where.user = { id: filterOptions.userId };
+    }
+
     const entities = await this.sitesRepository.find({
       skip: (paginationOptions.page - 1) * paginationOptions.limit,
       take: paginationOptions.limit,

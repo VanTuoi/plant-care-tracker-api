@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpStatus,
+  Injectable,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { SiteRepository } from './infrastructure/persistence/site.repository';
 import { Site } from './domain/site';
 import { NullableType } from '../utils/types/nullable.type';
@@ -6,41 +11,64 @@ import { IPaginationOptions } from '../utils/types/pagination-options';
 import { FilterSiteDto, SortSiteDto } from './dto/query-site.dto';
 import { CreateSiteDto } from './dto/create-site.dto';
 import { UpdateSiteDto } from './dto/update-site.dto';
+import { UsersService } from '../users/users.service';
+import { JwtPayloadType } from '../common/types/jwt-payload.type';
+import { RoleEnum } from '../roles/roles.enum';
 
 @Injectable()
 export class SitesService {
-  constructor(private readonly sitesRepository: SiteRepository) {}
+  constructor(
+    private readonly sitesRepository: SiteRepository,
+    private readonly userService: UsersService,
+  ) {}
 
-  async create(createSiteDto: CreateSiteDto): Promise<Site> {
-    // check role or user id
+  async create(
+    createSiteDto: CreateSiteDto,
+    jwt: JwtPayloadType,
+  ): Promise<Site> {
+    const user = await this.userService.findById(createSiteDto.userId);
+    if (!user) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          user: 'userNotExists',
+        },
+      });
+    }
+
+    if (jwt.role?.id !== RoleEnum.admin && jwt.id !== user.id) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.FORBIDDEN,
+        errors: {
+          user: 'cannotCreateSiteForAnotherUser',
+        },
+      });
+    }
+
     return this.sitesRepository.create({
-      name: createSiteDto.name,
-      description: createSiteDto.description,
-      sunlight: createSiteDto.sunlight,
-      lightDuration: createSiteDto.lightDuration,
-      lightType: createSiteDto.lightType,
-      soilMoisture: createSiteDto.soilMoisture,
-      soilType: createSiteDto.soilType,
-      phSoil: createSiteDto.phSoil,
-      temperature: createSiteDto.temperature,
-      humidity: createSiteDto.humidity,
-      windExposure: createSiteDto.windExposure,
-      latitude: createSiteDto.latitude,
-      longitude: createSiteDto.longitude,
-      altitude: createSiteDto.altitude,
-      userId: createSiteDto.userId,
+      ...createSiteDto,
+      userId: user.id,
     });
   }
 
-  findManyWithPagination({
+  async findManyWithPagination({
     filterOptions,
     sortOptions,
     paginationOptions,
+    jwt,
   }: {
     filterOptions?: FilterSiteDto | null;
     sortOptions?: SortSiteDto[] | null;
     paginationOptions: IPaginationOptions;
+    jwt: JwtPayloadType;
   }): Promise<Site[]> {
+    if (jwt.role?.id !== RoleEnum.admin) {
+      filterOptions = {
+        ...filterOptions,
+        userId: jwt.id,
+      };
+    }
+
     return this.sitesRepository.findManyWithPagination({
       filterOptions,
       sortOptions,
@@ -48,8 +76,23 @@ export class SitesService {
     });
   }
 
-  findById(id: Site['id']): Promise<NullableType<Site>> {
-    return this.sitesRepository.findById(id);
+  async findById(
+    id: Site['id'],
+    jwt: JwtPayloadType,
+  ): Promise<NullableType<Site>> {
+    const site = await this.sitesRepository.findById(id);
+    if (!site) return null;
+
+    if (jwt.role?.id !== RoleEnum.admin && jwt.id !== site.userId) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.FORBIDDEN,
+        errors: {
+          user: 'cannotFindSiteForAnotherUser',
+        },
+      });
+    }
+
+    return site;
   }
 
   findByIds(ids: Site['id'][]): Promise<Site[]> {
@@ -59,27 +102,39 @@ export class SitesService {
   async update(
     id: Site['id'],
     updateSiteDto: UpdateSiteDto,
+    jwt: JwtPayloadType,
   ): Promise<Site | null> {
+    const site = await this.sitesRepository.findById(id);
+    if (!site) return null;
+
+    if (jwt.role?.id !== RoleEnum.admin && jwt.id !== site.userId) {
+      throw new ForbiddenException({
+        status: HttpStatus.FORBIDDEN,
+        errors: {
+          user: 'cannotUpdateSiteOfAnotherUser',
+        },
+      });
+    }
+
     return this.sitesRepository.update(id, {
-      name: updateSiteDto.name,
-      description: updateSiteDto.description,
-      sunlight: updateSiteDto.sunlight,
-      lightDuration: updateSiteDto.lightDuration,
-      lightType: updateSiteDto.lightType,
-      soilMoisture: updateSiteDto.soilMoisture,
-      soilType: updateSiteDto.soilType,
-      phSoil: updateSiteDto.phSoil,
-      temperature: updateSiteDto.temperature,
-      humidity: updateSiteDto.humidity,
-      windExposure: updateSiteDto.windExposure,
-      latitude: updateSiteDto.latitude,
-      longitude: updateSiteDto.longitude,
-      altitude: updateSiteDto.altitude,
-      userId: updateSiteDto.userId,
+      ...updateSiteDto,
+      userId: site.userId,
     });
   }
 
-  async remove(id: Site['id']): Promise<void> {
+  async remove(id: Site['id'], jwt: JwtPayloadType): Promise<void> {
+    const site = await this.sitesRepository.findById(id);
+    if (!site) return;
+
+    if (jwt.role?.id !== RoleEnum.admin && jwt.id !== site.userId) {
+      throw new ForbiddenException({
+        status: HttpStatus.FORBIDDEN,
+        errors: {
+          user: 'cannotDeleteSiteOfAnotherUser',
+        },
+      });
+    }
+
     await this.sitesRepository.remove(id);
   }
 }

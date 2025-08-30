@@ -18,6 +18,11 @@ export class FilterSiteDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  userId?: string;
 }
 
 export class SortSiteDto {
