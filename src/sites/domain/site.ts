@@ -1,14 +1,25 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsOptional, IsNumber, IsUUID } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsUUID,
+  ValidateIf,
+} from 'class-validator';
 
 export class Site {
   @ApiProperty({ description: 'ID duy nhất của site', example: 'uuid' })
   @IsUUID()
   id: string;
 
-  @ApiProperty({ description: 'Tên site', example: 'Ban công hướng Nam' })
+  @ApiProperty({
+    description: 'Tên site',
+    example: 'Ban công hướng Nam',
+    required: false,
+  })
+  @ValidateIf((o) => !o.templateSiteId)
   @IsString()
-  name: string;
+  name?: string;
 
   @ApiPropertyOptional({
     description: 'Mô tả site',
@@ -100,6 +111,11 @@ export class Site {
   @IsOptional()
   @IsUUID()
   userId?: string;
+
+  @ApiPropertyOptional({ description: 'ID của mẫu', example: 'uuid' })
+  @IsOptional()
+  @IsUUID()
+  templateSiteId?: string;
 
   @ApiPropertyOptional({
     description: 'Ngày tạo',
