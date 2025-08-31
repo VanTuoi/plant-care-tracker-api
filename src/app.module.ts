@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { FilesModule } from './files/files.module';
-import { PlantModule } from './notification/notification.module';
 import { AuthModule } from './auth/auth.module';
 import databaseConfig from './database/config/database.config';
 import authConfig from './auth/config/auth.config';
@@ -20,7 +19,8 @@ import { HomeModule } from './home/home.module';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
-import { MailerModule } from './mailer/mailer.module';
+import { NotifierModule } from './notifier/notifier.module';
+import { CalendarReminderModule } from './calendar-reminder/calendar-reminder.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -69,13 +69,13 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     }),
     UsersModule,
     FilesModule,
-    PlantModule,
     AuthModule,
     AuthGoogleModule,
     SessionModule,
     MailModule,
-    MailerModule,
+    NotifierModule,
     HomeModule,
+    CalendarReminderModule,
   ],
 })
 export class AppModule {}
