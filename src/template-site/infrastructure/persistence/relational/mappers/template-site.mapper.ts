@@ -1,11 +1,9 @@
-import { SiteEntity } from '../entities/site.entity';
-import { Site } from '../../../../domain/site';
-import { UserEntity } from '../../../../../users/infrastructure/persistence/relational/entities/user.entity';
-import { TemplateSiteEntity } from '../../../../../template-site/infrastructure/persistence/relational/entities/template-site.entity';
+import { TemplateSite } from '../../../../domain/template-site';
+import { TemplateSiteEntity } from '../entities/template-site.entity';
 
-export class SiteMapper {
-  static toDomain(raw: SiteEntity): Site {
-    const domainEntity = new Site();
+export class TemplateSiteMapper {
+  static toDomain(raw: TemplateSiteEntity): TemplateSite {
+    const domainEntity = new TemplateSite();
     domainEntity.id = raw.id;
     domainEntity.name = raw.name;
     domainEntity.description = raw.description;
@@ -21,17 +19,15 @@ export class SiteMapper {
     domainEntity.latitude = raw.latitude;
     domainEntity.longitude = raw.longitude;
     domainEntity.altitude = raw.altitude;
-    domainEntity.userId = raw.user.id as any;
-    domainEntity.templateSiteId = raw.template?.id as any;
     domainEntity.createdAt = raw.createdAt;
     domainEntity.updatedAt = raw.updatedAt;
     return domainEntity;
   }
 
-  static toPersistence(domainEntity: Site): SiteEntity {
-    const persistenceEntity = new SiteEntity();
+  static toPersistence(domainEntity: TemplateSite): TemplateSiteEntity {
+    const persistenceEntity = new TemplateSiteEntity();
     persistenceEntity.id = domainEntity.id;
-    persistenceEntity.name = domainEntity.name!;
+    persistenceEntity.name = domainEntity.name;
     persistenceEntity.description = domainEntity.description;
     persistenceEntity.sunlight = domainEntity.sunlight;
     persistenceEntity.lightDuration = domainEntity.lightDuration;
@@ -45,21 +41,27 @@ export class SiteMapper {
     persistenceEntity.latitude = domainEntity.latitude;
     persistenceEntity.longitude = domainEntity.longitude;
     persistenceEntity.altitude = domainEntity.altitude;
-
-    if (domainEntity.userId) {
-      const userEntity = new UserEntity();
-      userEntity.id = domainEntity.userId as any;
-      persistenceEntity.user = userEntity;
-    }
-
-    if (domainEntity.templateSiteId) {
-      const templateSiteEntity = new TemplateSiteEntity();
-      templateSiteEntity.id = domainEntity.templateSiteId as any;
-      persistenceEntity.template = templateSiteEntity;
-    }
-
     persistenceEntity.createdAt = domainEntity.createdAt;
     persistenceEntity.updatedAt = domainEntity.updatedAt;
     return persistenceEntity;
+  }
+
+  static toSiteBase(template: TemplateSite) {
+    return {
+      name: template.name,
+      description: template.description,
+      sunlight: template.sunlight,
+      lightDuration: template.lightDuration,
+      lightType: template.lightType,
+      soilMoisture: template.soilMoisture,
+      soilType: template.soilType,
+      phSoil: template.phSoil,
+      temperature: template.temperature,
+      humidity: template.humidity,
+      windExposure: template.windExposure,
+      latitude: template.latitude,
+      longitude: template.longitude,
+      altitude: template.altitude,
+    };
   }
 }

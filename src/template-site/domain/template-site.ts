@@ -7,10 +7,10 @@ import {
   IsDate,
 } from 'class-validator';
 
-export class TemplateSiteDto {
+export class TemplateSite {
   @ApiProperty({ description: 'ID duy nhất của site', example: 'uuid' })
   @IsUUID()
-  readonly id: string;
+  id: string;
 
   @ApiProperty({ description: 'Tên site', example: 'Ban công hướng Nam' })
   @IsString()
@@ -106,15 +106,13 @@ export class TemplateSiteDto {
     description: 'Ngày tạo',
     example: '2025-08-30T12:00:00Z',
   })
-  @IsOptional()
   @IsDate()
-  createdAt?: Date;
+  createdAt: Date;
 
   @ApiPropertyOptional({
     description: 'Ngày cập nhật',
     example: '2025-08-30T12:30:00Z',
   })
-  @IsOptional()
   @IsDate()
-  updatedAt?: Date;
+  updatedAt: Date;
 }

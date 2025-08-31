@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 import { UserEntity } from '../../../../../users/infrastructure/persistence/relational/entities/user.entity';
+import { TemplateSiteEntity } from '../../../../../template-site/infrastructure/persistence/relational/entities/template-site.entity';
 
 @Entity('site')
 export class SiteEntity extends EntityRelationalHelper {
@@ -58,6 +59,9 @@ export class SiteEntity extends EntityRelationalHelper {
 
   @ManyToOne(() => UserEntity, { eager: true })
   user: UserEntity;
+
+  @ManyToOne(() => TemplateSiteEntity, { eager: true, nullable: true })
+  template?: TemplateSiteEntity;
 
   @CreateDateColumn()
   createdAt: Date;

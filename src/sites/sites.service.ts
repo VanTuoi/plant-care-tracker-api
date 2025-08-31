@@ -14,11 +14,14 @@ import { UpdateSiteDto } from './dto/update-site.dto';
 import { UsersService } from '../users/users.service';
 import { JwtPayloadType } from '../common/types/jwt-payload.type';
 import { RoleEnum } from '../roles/roles.enum';
+import { TemplateSiteRepository } from '../template-site/infrastructure/persistence/relational/template-site.repository';
+import { TemplateSiteMapper } from '../template-site/infrastructure/persistence/relational/mappers/template-site.mapper';
 
 @Injectable()
 export class SitesService {
   constructor(
     private readonly sitesRepository: SiteRepository,
+    private readonly templateSitesRepository: TemplateSiteRepository,
     private readonly userService: UsersService,
   ) {}
 
@@ -45,10 +48,26 @@ export class SitesService {
       });
     }
 
-    return this.sitesRepository.create({
-      ...createSiteDto,
-      userId: user.id,
-    });
+    let siteData = { ...createSiteDto, userId: user.id };
+    if (createSiteDto.templateSiteId) {
+      const template = await this.templateSitesRepository.findById(
+        createSiteDto.templateSiteId,
+      );
+      if (!template) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: { template: 'templateNotExists' },
+        });
+      }
+
+      siteData = {
+        ...TemplateSiteMapper.toSiteBase(template),
+        ...createSiteDto,
+        userId: user.id,
+      };
+    }
+
+    return this.sitesRepository.create(siteData);
   }
 
   async findManyWithPagination({
