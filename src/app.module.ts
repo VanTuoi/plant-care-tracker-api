@@ -21,6 +21,7 @@ import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
 import { NotifierModule } from './notifier/notifier.module';
 import { CalendarReminderModule } from './calendar-reminder/calendar-reminder.module';
+import { SitesModule } from './sites/site.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -76,6 +77,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     NotifierModule,
     HomeModule,
     CalendarReminderModule,
+    SitesModule,
   ],
 })
 export class AppModule {}
