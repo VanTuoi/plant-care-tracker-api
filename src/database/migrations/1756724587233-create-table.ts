@@ -1,15 +1,9 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateTable1756658770753 implements MigrationInterface {
-  name = 'CreateTable1756658770753';
+export class CreateTable1756724587233 implements MigrationInterface {
+  name = 'CreateTable1756724587233';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `CREATE TYPE "public"."notifications_priority_enum" AS ENUM('LOW', 'NORMAL', 'HIGH', 'CRITICAL')`,
-    );
-    await queryRunner.query(
-      `CREATE TABLE "notifications" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "userId" character varying NOT NULL, "email" character varying, "title" character varying NOT NULL, "message" character varying NOT NULL, "payload" jsonb, "priority" "public"."notifications_priority_enum" NOT NULL DEFAULT 'NORMAL', "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_6a72c3c0f683f6462415e653c3a" PRIMARY KEY ("id"))`,
-    );
     await queryRunner.query(
       `CREATE TYPE "public"."notification_channels_status_enum" AS ENUM('PENDING', 'SENT', 'FAILED', 'READ')`,
     );
@@ -38,6 +32,21 @@ export class CreateTable1756658770753 implements MigrationInterface {
       `CREATE INDEX "IDX_f0e1b4ecdca13b177e2e3a0613" ON "user" ("lastName") `,
     );
     await queryRunner.query(
+      `CREATE TABLE "plant" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, CONSTRAINT "PK_97e1eb0d045aadea59401ece5ba" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."water_method_enum" AS ENUM('root', 'spray', 'immersion', 'drip', 'wick', 'self_watering', 'overhead')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "water" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "note" text, "amount" integer NOT NULL, "method" "public"."water_method_enum" NOT NULL, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "plantId" uuid, CONSTRAINT "PK_8fe16d29fb45be6c0de0b2ed6a3" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "session" ("id" SERIAL NOT NULL, "hash" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "userId" uuid, CONSTRAINT "PK_f55da76ac1c3ac420f444d2ff11" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_3d2f174ef04fb312fdebd0ddc5" ON "session" ("userId") `,
+    );
+    await queryRunner.query(
       `CREATE TABLE "template_site" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "description" character varying, "sunlight" character varying, "lightDuration" character varying, "lightType" character varying, "soilMoisture" character varying, "soilType" character varying, "phSoil" character varying, "temperature" double precision, "humidity" double precision, "windExposure" character varying, "latitude" double precision, "longitude" double precision, "altitude" double precision, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_e0caf3b6cfcb486ee79c48a98d1" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
@@ -53,10 +62,10 @@ export class CreateTable1756658770753 implements MigrationInterface {
       `CREATE INDEX "IDX_72005e7b5fbd98db98353f74cb" ON "species" ("scientificName") `,
     );
     await queryRunner.query(
-      `CREATE TABLE "session" ("id" SERIAL NOT NULL, "hash" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "userId" uuid, CONSTRAINT "PK_f55da76ac1c3ac420f444d2ff11" PRIMARY KEY ("id"))`,
+      `CREATE TYPE "public"."notifications_priority_enum" AS ENUM('LOW', 'NORMAL', 'HIGH', 'CRITICAL')`,
     );
     await queryRunner.query(
-      `CREATE INDEX "IDX_3d2f174ef04fb312fdebd0ddc5" ON "session" ("userId") `,
+      `CREATE TABLE "notifications" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "userId" character varying NOT NULL, "email" character varying, "title" character varying NOT NULL, "message" character varying NOT NULL, "payload" jsonb, "priority" "public"."notifications_priority_enum" NOT NULL DEFAULT 'NORMAL', "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_6a72c3c0f683f6462415e653c3a" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `ALTER TABLE "user" ADD CONSTRAINT "FK_75e2be4ce11d447ef43be0e374f" FOREIGN KEY ("photoId") REFERENCES "file"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
@@ -68,6 +77,12 @@ export class CreateTable1756658770753 implements MigrationInterface {
       `ALTER TABLE "user" ADD CONSTRAINT "FK_dc18daa696860586ba4667a9d31" FOREIGN KEY ("statusId") REFERENCES "status"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
     await queryRunner.query(
+      `ALTER TABLE "water" ADD CONSTRAINT "FK_16792cc5f45502f4a1e6d3409eb" FOREIGN KEY ("plantId") REFERENCES "plant"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "session" ADD CONSTRAINT "FK_3d2f174ef04fb312fdebd0ddc53" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
       `ALTER TABLE "site" ADD CONSTRAINT "FK_e03827c061fbf85fd3aae454aec" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
     await queryRunner.query(
@@ -76,15 +91,9 @@ export class CreateTable1756658770753 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "species" ADD CONSTRAINT "FK_cc9d8d4fd9cab08f58b95cf6471" FOREIGN KEY ("imageId") REFERENCES "file"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
-    await queryRunner.query(
-      `ALTER TABLE "session" ADD CONSTRAINT "FK_3d2f174ef04fb312fdebd0ddc53" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
-    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `ALTER TABLE "session" DROP CONSTRAINT "FK_3d2f174ef04fb312fdebd0ddc53"`,
-    );
     await queryRunner.query(
       `ALTER TABLE "species" DROP CONSTRAINT "FK_cc9d8d4fd9cab08f58b95cf6471"`,
     );
@@ -95,6 +104,12 @@ export class CreateTable1756658770753 implements MigrationInterface {
       `ALTER TABLE "site" DROP CONSTRAINT "FK_e03827c061fbf85fd3aae454aec"`,
     );
     await queryRunner.query(
+      `ALTER TABLE "session" DROP CONSTRAINT "FK_3d2f174ef04fb312fdebd0ddc53"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "water" DROP CONSTRAINT "FK_16792cc5f45502f4a1e6d3409eb"`,
+    );
+    await queryRunner.query(
       `ALTER TABLE "user" DROP CONSTRAINT "FK_dc18daa696860586ba4667a9d31"`,
     );
     await queryRunner.query(
@@ -103,10 +118,8 @@ export class CreateTable1756658770753 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "user" DROP CONSTRAINT "FK_75e2be4ce11d447ef43be0e374f"`,
     );
-    await queryRunner.query(
-      `DROP INDEX "public"."IDX_3d2f174ef04fb312fdebd0ddc5"`,
-    );
-    await queryRunner.query(`DROP TABLE "session"`);
+    await queryRunner.query(`DROP TABLE "notifications"`);
+    await queryRunner.query(`DROP TYPE "public"."notifications_priority_enum"`);
     await queryRunner.query(
       `DROP INDEX "public"."IDX_72005e7b5fbd98db98353f74cb"`,
     );
@@ -116,6 +129,13 @@ export class CreateTable1756658770753 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE "species"`);
     await queryRunner.query(`DROP TABLE "site"`);
     await queryRunner.query(`DROP TABLE "template_site"`);
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_3d2f174ef04fb312fdebd0ddc5"`,
+    );
+    await queryRunner.query(`DROP TABLE "session"`);
+    await queryRunner.query(`DROP TABLE "water"`);
+    await queryRunner.query(`DROP TYPE "public"."water_method_enum"`);
+    await queryRunner.query(`DROP TABLE "plant"`);
     await queryRunner.query(
       `DROP INDEX "public"."IDX_f0e1b4ecdca13b177e2e3a0613"`,
     );
@@ -133,7 +153,5 @@ export class CreateTable1756658770753 implements MigrationInterface {
     await queryRunner.query(
       `DROP TYPE "public"."notification_channels_status_enum"`,
     );
-    await queryRunner.query(`DROP TABLE "notifications"`);
-    await queryRunner.query(`DROP TYPE "public"."notifications_priority_enum"`);
   }
 }
