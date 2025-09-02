@@ -1,12 +1,13 @@
 import { PlantEntity } from '../../../../../plants/infrastructure/persistence/relational/entities/plants.entity';
-import { Water } from '../../../../domain/water';
-import { WaterEntity } from '../entities/water.entity';
+import { Fertilizer } from '../../../../domain/fertilizers';
+import { FertilizerEntity } from '../entities/fertilizers.entity';
 
-export class WaterMapper {
-  static toDomain(raw: WaterEntity): Water {
-    const domainEntity = new Water();
+export class FertilizerMapper {
+  static toDomain(raw: FertilizerEntity): Fertilizer {
+    const domainEntity = new Fertilizer();
     domainEntity.id = raw.id;
     domainEntity.note = raw.note;
+    domainEntity.fertilizerType = raw.fertilizerType;
     domainEntity.amount = raw.amount;
     domainEntity.method = raw.method;
     domainEntity.createdAt = raw.createdAt;
@@ -16,12 +17,15 @@ export class WaterMapper {
     return domainEntity;
   }
 
-  static toPersistence(domainEntity: Water): WaterEntity {
-    const persistenceEntity = new WaterEntity();
+  static toPersistence(domainEntity: Fertilizer): FertilizerEntity {
+    const persistenceEntity = new FertilizerEntity();
+
     if (domainEntity.id) {
       persistenceEntity.id = domainEntity.id;
     }
+
     persistenceEntity.note = domainEntity.note;
+    persistenceEntity.fertilizerType = domainEntity.fertilizerType;
     persistenceEntity.amount = domainEntity.amount;
     persistenceEntity.method = domainEntity.method;
 

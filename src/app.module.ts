@@ -24,6 +24,9 @@ import { CalendarReminderModule } from './calendar-reminder/calendar-reminder.mo
 import { SitesModule } from './sites/sites.module';
 import { SpeciesModule } from './species/species.module';
 import { WatersModule } from './waters/waters.module';
+import { FertilizersModule } from './fertilizers/fertilizers.module';
+import { PlantsModule } from './plants/plants.module';
+import { TemplateSitesModule } from './template-sites/template-sites.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -71,17 +74,20 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
       inject: [ConfigService],
     }),
     UsersModule,
-    FilesModule,
     AuthModule,
     AuthGoogleModule,
     SessionModule,
+    FilesModule,
     MailModule,
     NotifierModule,
-    HomeModule,
     CalendarReminderModule,
+    HomeModule,
+    TemplateSitesModule,
     SitesModule,
     SpeciesModule,
+    PlantsModule,
     WatersModule,
+    FertilizersModule,
   ],
 })
 export class AppModule {}

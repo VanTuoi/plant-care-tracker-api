@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateTable1756804652016 implements MigrationInterface {
-  name = 'CreateTable1756804652016';
+export class CreateTable1756813930564 implements MigrationInterface {
+  name = 'CreateTable1756813930564';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -131,6 +131,15 @@ export class CreateTable1756804652016 implements MigrationInterface {
       `CREATE INDEX "IDX_3d2f174ef04fb312fdebd0ddc5" ON "session" ("userId") `,
     );
     await queryRunner.query(
+      `CREATE TYPE "public"."fertilizer_fertilizertype_enum" AS ENUM('organic', 'inorganic', 'npk', 'urea', 'ammonium_sulfate', 'liquid', 'compost', 'manure', 'bonemeal', 'bloodmeal', 'green_manure', 'micro_nutrient', 'other')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."fertilizer_method_enum" AS ENUM('soil_mixing', 'surface_spread', 'liquid_feed', 'foliar_feed', 'other')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "fertilizer" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "note" text, "fertilizerType" "public"."fertilizer_fertilizertype_enum" NOT NULL, "amount" integer NOT NULL, "method" "public"."fertilizer_method_enum" NOT NULL, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "plantId" uuid, CONSTRAINT "PK_3d0704e83bef3b07de441b2f47a" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
       `ALTER TABLE "user" ADD CONSTRAINT "FK_75e2be4ce11d447ef43be0e374f" FOREIGN KEY ("photoId") REFERENCES "file"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
     await queryRunner.query(
@@ -163,9 +172,15 @@ export class CreateTable1756804652016 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "session" ADD CONSTRAINT "FK_3d2f174ef04fb312fdebd0ddc53" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
+    await queryRunner.query(
+      `ALTER TABLE "fertilizer" ADD CONSTRAINT "FK_d9585ff33f254a4c346aed2dace" FOREIGN KEY ("plantId") REFERENCES "plant"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `ALTER TABLE "fertilizer" DROP CONSTRAINT "FK_d9585ff33f254a4c346aed2dace"`,
+    );
     await queryRunner.query(
       `ALTER TABLE "session" DROP CONSTRAINT "FK_3d2f174ef04fb312fdebd0ddc53"`,
     );
@@ -198,6 +213,11 @@ export class CreateTable1756804652016 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE "user" DROP CONSTRAINT "FK_75e2be4ce11d447ef43be0e374f"`,
+    );
+    await queryRunner.query(`DROP TABLE "fertilizer"`);
+    await queryRunner.query(`DROP TYPE "public"."fertilizer_method_enum"`);
+    await queryRunner.query(
+      `DROP TYPE "public"."fertilizer_fertilizertype_enum"`,
     );
     await queryRunner.query(
       `DROP INDEX "public"."IDX_3d2f174ef04fb312fdebd0ddc5"`,

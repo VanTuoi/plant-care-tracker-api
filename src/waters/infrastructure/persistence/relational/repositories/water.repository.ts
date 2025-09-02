@@ -5,7 +5,7 @@ import { In, Repository } from 'typeorm';
 import { WaterEntity } from '../entities/water.entity';
 import { Water } from '../../../../domain/water';
 import { NullableType } from '../../../../../utils/types/nullable.type';
-import { WaterRepository } from '../water.repository';
+import { WaterRepository } from '../../water.repository';
 import { WaterMapper } from '../mappers/water';
 
 @Injectable()
@@ -15,9 +15,7 @@ export class WatersRelationalRepository implements WaterRepository {
     private readonly repo: Repository<WaterEntity>,
   ) {}
 
-  async create(
-    data: Omit<Water, 'id' | 'createdAt' | 'updatedAt'>,
-  ): Promise<Water> {
+  async create(data: Water): Promise<Water> {
     const persistenceEntity = WaterMapper.toPersistence(data);
     const entity = this.repo.create(persistenceEntity);
     const saved = await this.repo.save(entity);
