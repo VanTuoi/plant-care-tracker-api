@@ -10,6 +10,9 @@ import { UserSeedModule } from './user/user-seed.module';
 import databaseConfig from '../../config/database.config';
 import appConfig from '../../../config/app.config';
 import { TemplateSiteSeedModule } from './template-site/template-site-seed.module';
+import { SiteSeedModule } from './sites/site-seed.module';
+import { SpeciesSeedModule } from './species/species-seed.module';
+import { PlantSeedModule } from './plants/plants-seed.module';
 
 @Module({
   imports: [
@@ -17,6 +20,9 @@ import { TemplateSiteSeedModule } from './template-site/template-site-seed.modul
     StatusSeedModule,
     UserSeedModule,
     TemplateSiteSeedModule,
+    SiteSeedModule,
+    SpeciesSeedModule,
+    PlantSeedModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [databaseConfig, appConfig],

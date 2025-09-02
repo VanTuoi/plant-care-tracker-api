@@ -5,19 +5,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-  ManyToOne,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
-import { UserEntity } from '../../../../../users/infrastructure/persistence/relational/entities/user.entity';
-import { TemplateSiteEntity } from '../../../../../template-sites/infrastructure/persistence/relational/entities/template-sites.entity';
-import {
-  Sunlight,
-  LightType,
-  SoilType,
-} from '../../../../../template-sites/template-sites.enum';
+import { LightType, SoilType, Sunlight } from '../../../../template-sites.enum';
 
-@Entity('site')
-export class SiteEntity extends EntityRelationalHelper {
+@Entity({ name: 'template_site' })
+export class TemplateSiteEntity extends EntityRelationalHelper {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -27,12 +20,7 @@ export class SiteEntity extends EntityRelationalHelper {
   @Column({ nullable: true })
   description?: string;
 
-  @Column({
-    type: 'enum',
-    enum: Sunlight,
-    default: Sunlight.UNKNOWN,
-    nullable: true,
-  })
+  @Column({ type: 'enum', enum: Sunlight, default: Sunlight.UNKNOWN })
   sunlight?: Sunlight;
 
   @Column({ type: 'float', nullable: true })
@@ -77,12 +65,6 @@ export class SiteEntity extends EntityRelationalHelper {
 
   @Column({ type: 'float', nullable: true })
   altitude?: number;
-
-  @ManyToOne(() => UserEntity, { eager: true })
-  user: UserEntity;
-
-  @ManyToOne(() => TemplateSiteEntity, { eager: true, nullable: true })
-  template?: TemplateSiteEntity;
 
   @CreateDateColumn()
   createdAt: Date;
