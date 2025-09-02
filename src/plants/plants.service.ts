@@ -16,11 +16,13 @@ import { RoleEnum } from '../roles/roles.enum';
 import { SpeciesRepository } from '../species/infrastructure/persistence/species.repository';
 import { SpeciesMapper } from '../species/infrastructure/persistence/relational/mappers/species.mapper';
 import { PlantRepository } from './infrastructure/persistence/plants.repository';
+import { SitesService } from '../sites/sites.service';
 
 @Injectable()
 export class PlantsService {
   constructor(
     private readonly plantsRepository: PlantRepository,
+    private readonly sitesService: SitesService,
     private readonly speciesRepository: SpeciesRepository,
     private readonly userService: UsersService,
   ) {}
@@ -141,6 +143,24 @@ export class PlantsService {
         status: HttpStatus.FORBIDDEN,
         errors: { user: 'cannotUpdatePlantOfAnotherUser' },
       });
+    }
+
+    if (updatePlantDto.siteId) {
+      const site = await this.sitesService.findById(updatePlantDto.siteId, jwt);
+
+      if (!site) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: { site: 'siteNotExists' },
+        });
+      }
+
+      if (jwt.role?.id !== RoleEnum.admin && jwt.id !== site.userId) {
+        throw new ForbiddenException({
+          status: HttpStatus.FORBIDDEN,
+          errors: { site: 'cannotAssignPlantToAnotherUserSite' },
+        });
+      }
     }
 
     return this.plantsRepository.update(id, {
