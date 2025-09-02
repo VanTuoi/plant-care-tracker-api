@@ -4,11 +4,17 @@ import { PlantsService } from './plants.service';
 import { PlantsController } from './plants.controller';
 import { UsersModule } from '../users/users.module';
 import { SpeciesModule } from '../species/species.module';
+import { SitesModule } from '../sites/sites.module';
 
 const infrastructurePersistenceModule = RelationalPlantPersistenceModule;
 
 @Module({
-  imports: [UsersModule, SpeciesModule, infrastructurePersistenceModule],
+  imports: [
+    UsersModule,
+    SpeciesModule,
+    SitesModule,
+    infrastructurePersistenceModule,
+  ],
   controllers: [PlantsController],
   providers: [PlantsService],
   exports: [infrastructurePersistenceModule, PlantsService],
