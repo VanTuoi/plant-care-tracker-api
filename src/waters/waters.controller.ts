@@ -14,7 +14,6 @@ import {
 import {
   ApiCreatedResponse,
   ApiOkResponse,
-  ApiParam,
   ApiTags,
   ApiBearerAuth,
   ApiBody,
@@ -30,6 +29,7 @@ import { WatersService } from './waters.service';
 import { CreateWaterDto } from './dto/create-water.dto';
 import { UpdateWaterDto } from './dto/update-water.dto';
 import { JwtPayloadType } from '../common/types/jwt-payload.type';
+import { WaterDto } from './dto/water.dto';
 
 @ApiBearerAuth()
 @Roles(RoleEnum.admin, RoleEnum.user)
@@ -77,16 +77,8 @@ export class WatersController {
   })
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @ApiParam({
-    name: 'id',
-    type: String,
-    required: true,
-  })
-  findOne(
-    @Param('id') id: Water['id'],
-    @Req() req,
-  ): Promise<NullableType<Water>> {
-    return this.watersService.findById(id, req.user as JwtPayloadType);
+  findOne(@Param() params: WaterDto, @Req() req): Promise<NullableType<Water>> {
+    return this.watersService.findById(params.id, req.user as JwtPayloadType);
   }
 
   @ApiOkResponse({
@@ -97,19 +89,14 @@ export class WatersController {
   })
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  @ApiParam({
-    name: 'id',
-    type: String,
-    required: true,
-  })
   @ApiBody({ type: UpdateWaterDto })
   update(
-    @Param('id') id: Water['id'],
+    @Param() params: WaterDto,
     @Body() updateWaterDto: UpdateWaterDto,
     @Req() req,
   ): Promise<Water | null> {
     return this.watersService.update(
-      id,
+      params.id,
       updateWaterDto,
       req.user as JwtPayloadType,
     );

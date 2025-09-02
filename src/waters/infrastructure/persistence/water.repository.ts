@@ -1,7 +1,7 @@
-import { Plant } from '../../../../plants/domain/plant';
-import { DeepPartial } from '../../../../utils/types/deep-partial.type';
-import { NullableType } from '../../../../utils/types/nullable.type';
-import { Water } from '../../../domain/water';
+import { Plant } from '../../../plants/domain/plant';
+import { DeepPartial } from '../../../utils/types/deep-partial.type';
+import { NullableType } from '../../../utils/types/nullable.type';
+import { Water } from '../../domain/water';
 
 export abstract class WaterRepository {
   abstract create(
