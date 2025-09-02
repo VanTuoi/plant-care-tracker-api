@@ -4,9 +4,15 @@ import {
   IsOptional,
   IsNumber,
   IsUUID,
+  IsEnum,
   IsDate,
 } from 'class-validator';
-
+import { WaterEnum } from '../../waters/waters.enum';
+import {
+  FertilizerMethodEnum,
+  FertilizerTypeEnum,
+} from '../../fertilizers/fertilizers.enum';
+import { DifficultyLevelEnum, SunlightNeedEnum } from '../species.enum';
 export class Species {
   @ApiProperty({ description: 'ID duy nhất của loài cây', example: 'uuid' })
   @IsUUID()
@@ -49,11 +55,12 @@ export class Species {
 
   @ApiPropertyOptional({
     description: 'Phương pháp tưới',
-    example: 'tưới gốc, phun sương',
+    enum: WaterEnum,
+    example: WaterEnum.ROOT,
   })
+  @IsEnum(WaterEnum)
   @IsOptional()
-  @IsString()
-  wateringMethod?: string;
+  wateringMethod?: WaterEnum;
 
   @ApiPropertyOptional({
     description: 'Tần suất bón phân (lần/tháng)',
@@ -73,35 +80,39 @@ export class Species {
 
   @ApiPropertyOptional({
     description: 'Phương pháp bón phân',
-    example: 'bón gốc, phun lá',
+    enum: FertilizerMethodEnum,
+    example: FertilizerMethodEnum.SOIL_MIXING,
   })
+  @IsEnum(FertilizerMethodEnum)
   @IsOptional()
-  @IsString()
-  fertilizingMethod?: string;
+  fertilizingMethod?: FertilizerMethodEnum;
 
   @ApiPropertyOptional({
     description: 'Loại phân bón',
-    example: 'NPK, hữu cơ',
+    enum: FertilizerTypeEnum,
+    example: FertilizerTypeEnum.ORGANIC,
   })
+  @IsEnum(FertilizerTypeEnum)
   @IsOptional()
-  @IsString()
-  fertilizerType?: string;
+  fertilizerType?: FertilizerTypeEnum;
 
   @ApiPropertyOptional({
     description: 'Nhu cầu ánh sáng',
-    example: 'full_sun, partial_shade',
+    enum: SunlightNeedEnum,
+    example: SunlightNeedEnum.FULL_SUN,
   })
+  @IsEnum(SunlightNeedEnum)
   @IsOptional()
-  @IsString()
-  sunlightNeed?: string;
+  sunlightNeed?: SunlightNeedEnum;
 
   @ApiPropertyOptional({
     description: 'Mức độ khó chăm sóc',
-    example: 'dễ, trung bình, khó',
+    enum: DifficultyLevelEnum,
+    example: DifficultyLevelEnum.MODERATE,
   })
+  @IsEnum(DifficultyLevelEnum)
   @IsOptional()
-  @IsString()
-  difficultyLevel?: string;
+  difficultyLevel?: DifficultyLevelEnum;
 
   @ApiPropertyOptional({
     description: 'Ngày tạo',

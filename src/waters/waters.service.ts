@@ -11,7 +11,7 @@ import { NullableType } from '../utils/types/nullable.type';
 import { WaterRepository } from './infrastructure/persistence/relational/water.repository';
 import { JwtPayloadType } from '../common/types/jwt-payload.type';
 import { RoleEnum } from '../roles/roles.enum';
-import { PlantRepository } from '../plants/infrastructure/persistence/relational/plants.repository';
+import { PlantRepository } from '../plants/infrastructure/persistence/plants.repository';
 
 @Injectable()
 export class WatersService {

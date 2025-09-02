@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, In } from 'typeorm';
 
 import { SpeciesEntity } from '../entities/species.entity';
-import { SpeciesRepository } from '../species.repository';
+import { SpeciesRepository } from '../../species.repository';
 import { Species } from '../../../../domain/species';
 import { SpeciesMapper } from '../mappers/species.mapper';
 import {

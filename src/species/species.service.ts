@@ -6,11 +6,17 @@ import {
 import { Species } from './domain/species';
 import { IPaginationOptions } from '../utils/types/pagination-options';
 import { FilterSpeciesDto, SortSpeciesDto } from './dto/query-species.dto';
-import { SpeciesRepository } from './infrastructure/persistence/relational/species.repository';
+import { SpeciesRepository } from './infrastructure/persistence/species.repository';
 import { CreateSpeciesDto } from './dto/create-species.dto';
 import { UpdateSpeciesDto } from './dto/update-species.dto';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
+import { WaterEnum } from '../waters/waters.enum';
+import {
+  FertilizerMethodEnum,
+  FertilizerTypeEnum,
+} from '../fertilizers/fertilizers.enum';
+import { DifficultyLevelEnum, SunlightNeedEnum } from './species.enum';
 
 @Injectable()
 export class SpeciesService {
@@ -115,16 +121,16 @@ export class SpeciesService {
       {
         name: 'Cây Mẫu',
         scientificName: 'Sample plantus',
-        imageId: '11111111-2222-3333-4444-555555555555',
+        imageId: '4f520d8a-62ec-43a9-8162-71713ae41563',
         wateringFrequency: 1,
         wateringAmount: 100,
-        wateringMethod: 'tưới gốc | phun sương',
+        wateringMethod: WaterEnum.ROOT,
         fertilizingFrequency: 1,
         fertilizingAmount: 20,
-        fertilizingMethod: 'bón gốc | phun lá',
-        fertilizerType: 'NPK | hữu cơ',
-        sunlightNeed: 'full_sun | partial_shade',
-        difficultyLevel: 'dễ | trung bình',
+        fertilizingMethod: FertilizerMethodEnum.SOIL_MIXING,
+        fertilizerType: FertilizerTypeEnum.NPK,
+        sunlightNeed: SunlightNeedEnum.FULL_SUN,
+        difficultyLevel: DifficultyLevelEnum.EASY,
       },
     ];
   }
