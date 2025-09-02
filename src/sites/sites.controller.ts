@@ -38,6 +38,7 @@ import {
 } from '../utils/dto/infinity-pagination-response.dto';
 import { infinityPagination } from '../utils/infinity-pagination';
 import { JwtPayloadType } from '../common/types/jwt-payload.type';
+import { SiteDto } from './dto/site.dto';
 
 @ApiBearerAuth()
 @Roles(RoleEnum.admin, RoleEnum.user)
@@ -101,14 +102,8 @@ export class SitesController {
     groups: ['admin'],
   })
   @Get(':id')
-  @HttpCode(HttpStatus.OK)
-  @ApiParam({
-    name: 'id',
-    type: String,
-    required: true,
-  })
-  findOne(@Param('id') id: Site['id'], @Req() req) {
-    return this.sitesService.findById(id, req.user as JwtPayloadType);
+  findOne(@Param() params: SiteDto, @Req() req) {
+    return this.sitesService.findById(params.id, req.user as JwtPayloadType);
   }
 
   @ApiOkResponse({
@@ -118,32 +113,22 @@ export class SitesController {
     groups: ['admin'],
   })
   @Patch(':id')
-  @HttpCode(HttpStatus.OK)
-  @ApiParam({
-    name: 'id',
-    type: String,
-    required: true,
-  })
   update(
-    @Param('id') id: Site['id'],
+    @Param() params: SiteDto,
     @Body() updateSiteDto: UpdateSiteDto,
     @Req() req,
   ): Promise<Site | null> {
     return this.sitesService.update(
-      id,
+      params.id,
       updateSiteDto,
       req.user as JwtPayloadType,
     );
   }
 
   @Delete(':id')
-  @ApiParam({
-    name: 'id',
-    type: String,
-    required: true,
-  })
+  @ApiParam({ name: 'id', type: String, required: true })
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: Site['id'], @Req() req): Promise<void> {
-    return this.sitesService.remove(id, req.user as JwtPayloadType);
+  remove(@Param() params: SiteDto, @Req() req): Promise<void> {
+    return this.sitesService.remove(params.id, req.user as JwtPayloadType);
   }
 }

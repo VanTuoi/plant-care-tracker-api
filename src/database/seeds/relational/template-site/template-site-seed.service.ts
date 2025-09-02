@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { TemplateSiteEntity } from '../../../../template-site/infrastructure/persistence/relational/entities/template-site.entity';
+import { TemplateSiteEntity } from '../../../../template-sites/infrastructure/persistence/relational/entities/template-sites.entity';
+import {
+  LightType,
+  SoilType,
+  Sunlight,
+} from '../../../../template-sites/template-sites.enum';
 
 @Injectable()
 export class TemplateSiteSeedService {
@@ -11,19 +16,19 @@ export class TemplateSiteSeedService {
   ) {}
 
   async run() {
-    const defaultSites = [
+    const defaultSites: Partial<TemplateSiteEntity>[] = [
       {
         name: 'Ban công hướng Nam',
         description: 'Khu vực nhiều nắng buổi sáng',
-        sunlight: 'full_sun',
-        lightDuration: '6h/day',
-        lightType: 'tự nhiên',
-        soilMoisture: 'ẩm vừa',
-        soilType: 'đất thịt',
-        phSoil: '6.5',
+        sunlight: Sunlight.FULL_SUN,
+        lightDuration: 6,
+        lightType: LightType.NATURAL,
+        soilMoisture: 50,
+        soilType: SoilType.CLAY,
+        phSoil: 6.5,
         temperature: 28,
         humidity: 65,
-        windExposure: 'trung bình',
+        windExposure: 50,
         latitude: 10.0452,
         longitude: 105.7469,
         altitude: 15,
@@ -31,15 +36,15 @@ export class TemplateSiteSeedService {
       {
         name: 'Trong phòng khách',
         description: 'Ánh sáng gián tiếp qua cửa kính',
-        sunlight: 'partial_shade',
-        lightDuration: '4h/day',
-        lightType: 'nhân tạo + tự nhiên',
-        soilMoisture: 'khô',
-        soilType: 'đất cát',
-        phSoil: '7.0',
+        sunlight: Sunlight.PARTIAL_SUN,
+        lightDuration: 4,
+        lightType: LightType.LED,
+        soilMoisture: 30,
+        soilType: SoilType.SANDY,
+        phSoil: 7.0,
         temperature: 27,
         humidity: 70,
-        windExposure: 'yếu',
+        windExposure: 10,
         latitude: 10.0452,
         longitude: 105.7469,
         altitude: 10,

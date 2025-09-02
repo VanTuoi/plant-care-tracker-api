@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 
 import { FilesModule } from '../files/files.module';
-import { SitesController } from './site.controller';
+import { SitesController } from './sites.controller';
 import { SitesService } from './sites.service';
 import { RelationalSitePersistenceModule } from './infrastructure/persistence/relational/relational-persistence.module';
 import { UsersModule } from '../users/users.module';
-import { TemplateSiteModule } from '../template-site/template-site.module';
+import { TemplateSitesModule } from '../template-sites/template-sites.module';
 
 const infrastructurePersistenceModule = RelationalSitePersistenceModule;
 
@@ -14,10 +14,10 @@ const infrastructurePersistenceModule = RelationalSitePersistenceModule;
     infrastructurePersistenceModule,
     UsersModule,
     FilesModule,
-    TemplateSiteModule,
+    TemplateSitesModule,
   ],
   controllers: [SitesController],
   providers: [SitesService],
-  exports: [SitesService, infrastructurePersistenceModule],
+  exports: [SitesService],
 })
 export class SitesModule {}

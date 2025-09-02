@@ -14,8 +14,8 @@ import { UpdateSiteDto } from './dto/update-site.dto';
 import { UsersService } from '../users/users.service';
 import { JwtPayloadType } from '../common/types/jwt-payload.type';
 import { RoleEnum } from '../roles/roles.enum';
-import { TemplateSiteRepository } from '../template-site/infrastructure/persistence/relational/template-site.repository';
-import { TemplateSiteMapper } from '../template-site/infrastructure/persistence/relational/mappers/template-site.mapper';
+import { TemplateSiteRepository } from '../template-sites/infrastructure/persistence/template-sites.repository';
+import { TemplateSiteMapper } from '../template-sites/infrastructure/persistence/relational/mappers/template-sites.mapper';
 
 @Injectable()
 export class SitesService {
@@ -29,7 +29,12 @@ export class SitesService {
     createSiteDto: CreateSiteDto,
     jwt: JwtPayloadType,
   ): Promise<Site> {
-    const user = await this.userService.findById(createSiteDto.userId);
+    const userId =
+      jwt.role?.id === RoleEnum.admin && createSiteDto.userId
+        ? createSiteDto.userId
+        : jwt.id;
+
+    const user = await this.userService.findById(userId);
     if (!user) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -100,7 +105,11 @@ export class SitesService {
     jwt: JwtPayloadType,
   ): Promise<NullableType<Site>> {
     const site = await this.sitesRepository.findById(id);
-    if (!site) return null;
+    if (!site)
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: { sites: 'sitesNotExists' },
+      });
 
     if (jwt.role?.id !== RoleEnum.admin && jwt.id !== site.userId) {
       throw new UnprocessableEntityException({
@@ -124,7 +133,11 @@ export class SitesService {
     jwt: JwtPayloadType,
   ): Promise<Site | null> {
     const site = await this.sitesRepository.findById(id);
-    if (!site) return null;
+    if (!site)
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: { sites: 'sitesNotExists' },
+      });
 
     if (jwt.role?.id !== RoleEnum.admin && jwt.id !== site.userId) {
       throw new ForbiddenException({
@@ -143,7 +156,11 @@ export class SitesService {
 
   async remove(id: Site['id'], jwt: JwtPayloadType): Promise<void> {
     const site = await this.sitesRepository.findById(id);
-    if (!site) return;
+    if (!site)
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: { sites: 'sitesNotExists' },
+      });
 
     if (jwt.role?.id !== RoleEnum.admin && jwt.id !== site.userId) {
       throw new ForbiddenException({

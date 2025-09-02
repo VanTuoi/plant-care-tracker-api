@@ -5,7 +5,9 @@ import {
   IsNumber,
   IsUUID,
   IsDate,
+  IsEnum,
 } from 'class-validator';
+import { Sunlight, LightType, SoilType } from '../template-sites.enum';
 
 export class TemplateSite {
   @ApiProperty({ description: 'ID duy nhất của site', example: 'uuid' })
@@ -26,45 +28,54 @@ export class TemplateSite {
 
   @ApiPropertyOptional({
     description: 'Ánh sáng nhận được',
-    example: 'full_sun, partial_shade',
+    example: Sunlight.FULL_SUN,
+    enum: Sunlight,
   })
   @IsOptional()
-  @IsString()
-  sunlight?: string;
+  @IsEnum(Sunlight)
+  sunlight?: Sunlight;
 
   @ApiPropertyOptional({
-    description: 'Thời gian chiếu sáng',
-    example: '6h/day',
+    description: 'Thời gian chiếu sáng (giờ)',
+    example: 6,
   })
   @IsOptional()
-  @IsString()
-  lightDuration?: string;
+  @IsNumber()
+  lightDuration?: number;
 
   @ApiPropertyOptional({
     description: 'Loại ánh sáng',
-    example: 'tự nhiên, nhân tạo',
+    example: LightType.NATURAL,
+    enum: LightType,
   })
   @IsOptional()
-  @IsString()
-  lightType?: string;
+  @IsEnum(LightType)
+  lightType?: LightType;
 
-  @ApiPropertyOptional({ description: 'Độ ẩm đất', example: 'ẩm vừa, khô' })
+  @ApiPropertyOptional({
+    description: 'Độ ẩm đất (%)',
+    example: 50,
+  })
   @IsOptional()
-  @IsString()
-  soilMoisture?: string;
+  @IsNumber()
+  soilMoisture?: number;
 
   @ApiPropertyOptional({
     description: 'Loại đất',
-    example: 'đất thịt, đất cát',
+    example: SoilType.LOAMY,
+    enum: SoilType,
   })
   @IsOptional()
-  @IsString()
-  soilType?: string;
+  @IsEnum(SoilType)
+  soilType?: SoilType;
 
-  @ApiPropertyOptional({ description: 'pH của đất', example: '6.5' })
+  @ApiPropertyOptional({
+    description: 'pH của đất',
+    example: 6.5,
+  })
   @IsOptional()
-  @IsString()
-  phSoil?: string;
+  @IsNumber()
+  phSoil?: number;
 
   @ApiPropertyOptional({ description: 'Nhiệt độ trung bình (°C)', example: 28 })
   @IsOptional()
@@ -76,13 +87,10 @@ export class TemplateSite {
   @IsNumber()
   humidity?: number;
 
-  @ApiPropertyOptional({
-    description: 'Mức độ gió',
-    example: 'mạnh, yếu, trung bình',
-  })
+  @ApiPropertyOptional({ description: 'Mức độ gió (m/s)', example: 3.5 })
   @IsOptional()
-  @IsString()
-  windExposure?: string;
+  @IsNumber()
+  windExposure?: number;
 
   @ApiPropertyOptional({ description: 'Vĩ độ', example: 10.0452 })
   @IsOptional()
@@ -115,4 +123,12 @@ export class TemplateSite {
   })
   @IsDate()
   updatedAt: Date;
+
+  @ApiPropertyOptional({
+    description: 'Ngày xóa (nếu đã xóa mềm)',
+    example: '2025-09-01T10:00:00Z',
+  })
+  @IsOptional()
+  @IsDate()
+  deletedAt?: Date | null;
 }

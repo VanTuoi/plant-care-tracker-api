@@ -1,5 +1,5 @@
 import { TemplateSite } from '../../../../domain/template-site';
-import { TemplateSiteEntity } from '../entities/template-site.entity';
+import { TemplateSiteEntity } from '../entities/template-sites.entity';
 
 export class TemplateSiteMapper {
   static toDomain(raw: TemplateSiteEntity): TemplateSite {
@@ -21,6 +21,7 @@ export class TemplateSiteMapper {
     domainEntity.altitude = raw.altitude;
     domainEntity.createdAt = raw.createdAt;
     domainEntity.updatedAt = raw.updatedAt;
+    domainEntity.deletedAt = raw.deletedAt;
     return domainEntity;
   }
 
@@ -43,6 +44,7 @@ export class TemplateSiteMapper {
     persistenceEntity.altitude = domainEntity.altitude;
     persistenceEntity.createdAt = domainEntity.createdAt;
     persistenceEntity.updatedAt = domainEntity.updatedAt;
+    persistenceEntity.deletedAt = domainEntity.deletedAt;
     return persistenceEntity;
   }
 

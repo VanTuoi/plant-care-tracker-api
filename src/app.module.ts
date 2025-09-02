@@ -21,7 +21,7 @@ import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
 import { NotifierModule } from './notifier/notifier.module';
 import { CalendarReminderModule } from './calendar-reminder/calendar-reminder.module';
-import { SitesModule } from './sites/site.module';
+import { SitesModule } from './sites/sites.module';
 import { SpeciesModule } from './species/species.module';
 import { WatersModule } from './waters/waters.module';
 

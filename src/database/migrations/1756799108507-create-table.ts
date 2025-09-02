@@ -1,20 +1,20 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateTable1756779333353 implements MigrationInterface {
-  name = 'CreateTable1756779333353';
+export class CreateTable1756799108507 implements MigrationInterface {
+  name = 'CreateTable1756799108507';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `CREATE TYPE "public"."notification_channels_status_enum" AS ENUM('PENDING', 'SENT', 'FAILED', 'READ')`,
-    );
-    await queryRunner.query(
-      `CREATE TABLE "notification_channels" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "notificationId" character varying NOT NULL, "channel" character varying NOT NULL, "deliveredAt" TIMESTAMP, "readAt" TIMESTAMP, "status" "public"."notification_channels_status_enum" NOT NULL DEFAULT 'PENDING', "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_3bc0cb5b60e8659f5fc859b2af0" PRIMARY KEY ("id"))`,
-    );
     await queryRunner.query(
       `CREATE TYPE "public"."notifications_priority_enum" AS ENUM('LOW', 'NORMAL', 'HIGH', 'CRITICAL')`,
     );
     await queryRunner.query(
       `CREATE TABLE "notifications" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "userId" character varying NOT NULL, "email" character varying, "title" character varying NOT NULL, "message" character varying NOT NULL, "payload" jsonb, "priority" "public"."notifications_priority_enum" NOT NULL DEFAULT 'NORMAL', "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_6a72c3c0f683f6462415e653c3a" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."notification_channels_status_enum" AS ENUM('PENDING', 'SENT', 'FAILED', 'READ')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "notification_channels" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "notificationId" character varying NOT NULL, "channel" character varying NOT NULL, "deliveredAt" TIMESTAMP, "readAt" TIMESTAMP, "status" "public"."notification_channels_status_enum" NOT NULL DEFAULT 'PENDING', "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_3bc0cb5b60e8659f5fc859b2af0" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TABLE "role" ("id" integer NOT NULL, "name" character varying NOT NULL, CONSTRAINT "PK_b36bcfe02fc8de3c57a8b2391c2" PRIMARY KEY ("id"))`,
@@ -62,10 +62,28 @@ export class CreateTable1756779333353 implements MigrationInterface {
       `CREATE INDEX "IDX_72005e7b5fbd98db98353f74cb" ON "species" ("scientificName") `,
     );
     await queryRunner.query(
-      `CREATE TABLE "template_site" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "description" character varying, "sunlight" character varying, "lightDuration" character varying, "lightType" character varying, "soilMoisture" character varying, "soilType" character varying, "phSoil" character varying, "temperature" double precision, "humidity" double precision, "windExposure" character varying, "latitude" double precision, "longitude" double precision, "altitude" double precision, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_e0caf3b6cfcb486ee79c48a98d1" PRIMARY KEY ("id"))`,
+      `CREATE TYPE "public"."template_site_sunlight_enum" AS ENUM('full_sun', 'partial_sun', 'shade', 'unknown')`,
     );
     await queryRunner.query(
-      `CREATE TABLE "site" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "description" character varying, "sunlight" character varying, "lightDuration" character varying, "lightType" character varying, "soilMoisture" character varying, "soilType" character varying, "phSoil" character varying, "temperature" double precision, "humidity" double precision, "windExposure" character varying, "latitude" double precision, "longitude" double precision, "altitude" double precision, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "userId" uuid, "templateId" uuid, CONSTRAINT "PK_635c0eeabda8862d5b0237b42b4" PRIMARY KEY ("id"))`,
+      `CREATE TYPE "public"."template_site_lighttype_enum" AS ENUM('led', 'fluorescent', 'incandescent', 'natural', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."template_site_soiltype_enum" AS ENUM('sandy', 'clay', 'loamy', 'peaty', 'chalky', 'silty', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "template_site" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "description" character varying, "sunlight" "public"."template_site_sunlight_enum" NOT NULL DEFAULT 'unknown', "lightDuration" double precision, "lightType" "public"."template_site_lighttype_enum" DEFAULT 'unknown', "soilMoisture" double precision, "soilType" "public"."template_site_soiltype_enum" DEFAULT 'unknown', "phSoil" double precision, "temperature" double precision, "humidity" double precision, "windExposure" double precision, "latitude" double precision, "longitude" double precision, "altitude" double precision, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, CONSTRAINT "PK_e0caf3b6cfcb486ee79c48a98d1" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."site_sunlight_enum" AS ENUM('full_sun', 'partial_sun', 'shade', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."site_lighttype_enum" AS ENUM('led', 'fluorescent', 'incandescent', 'natural', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."site_soiltype_enum" AS ENUM('sandy', 'clay', 'loamy', 'peaty', 'chalky', 'silty', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "site" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "description" character varying, "sunlight" "public"."site_sunlight_enum" DEFAULT 'unknown', "lightDuration" double precision, "lightType" "public"."site_lighttype_enum" DEFAULT 'unknown', "soilMoisture" double precision, "soilType" "public"."site_soiltype_enum" DEFAULT 'unknown', "phSoil" double precision, "temperature" double precision, "humidity" double precision, "windExposure" double precision, "latitude" double precision, "longitude" double precision, "altitude" double precision, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "userId" uuid, "templateId" uuid, CONSTRAINT "PK_635c0eeabda8862d5b0237b42b4" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TYPE "public"."plant_wateringmethod_enum" AS ENUM('root', 'spray', 'immersion', 'drip', 'wick', 'self_watering', 'overhead', 'other')`,
@@ -205,7 +223,15 @@ export class CreateTable1756779333353 implements MigrationInterface {
     );
     await queryRunner.query(`DROP TYPE "public"."plant_wateringmethod_enum"`);
     await queryRunner.query(`DROP TABLE "site"`);
+    await queryRunner.query(`DROP TYPE "public"."site_soiltype_enum"`);
+    await queryRunner.query(`DROP TYPE "public"."site_lighttype_enum"`);
+    await queryRunner.query(`DROP TYPE "public"."site_sunlight_enum"`);
     await queryRunner.query(`DROP TABLE "template_site"`);
+    await queryRunner.query(`DROP TYPE "public"."template_site_soiltype_enum"`);
+    await queryRunner.query(
+      `DROP TYPE "public"."template_site_lighttype_enum"`,
+    );
+    await queryRunner.query(`DROP TYPE "public"."template_site_sunlight_enum"`);
     await queryRunner.query(
       `DROP INDEX "public"."IDX_72005e7b5fbd98db98353f74cb"`,
     );
@@ -235,11 +261,11 @@ export class CreateTable1756779333353 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE "file"`);
     await queryRunner.query(`DROP TABLE "status"`);
     await queryRunner.query(`DROP TABLE "role"`);
-    await queryRunner.query(`DROP TABLE "notifications"`);
-    await queryRunner.query(`DROP TYPE "public"."notifications_priority_enum"`);
     await queryRunner.query(`DROP TABLE "notification_channels"`);
     await queryRunner.query(
       `DROP TYPE "public"."notification_channels_status_enum"`,
     );
+    await queryRunner.query(`DROP TABLE "notifications"`);
+    await queryRunner.query(`DROP TYPE "public"."notifications_priority_enum"`);
   }
 }

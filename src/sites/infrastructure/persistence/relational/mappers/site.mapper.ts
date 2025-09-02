@@ -1,7 +1,7 @@
 import { SiteEntity } from '../entities/site.entity';
 import { Site } from '../../../../domain/site';
 import { UserEntity } from '../../../../../users/infrastructure/persistence/relational/entities/user.entity';
-import { TemplateSiteEntity } from '../../../../../template-site/infrastructure/persistence/relational/entities/template-site.entity';
+import { TemplateSiteEntity } from '../../../../../template-sites/infrastructure/persistence/relational/entities/template-sites.entity';
 
 export class SiteMapper {
   static toDomain(raw: SiteEntity): Site {
@@ -21,10 +21,11 @@ export class SiteMapper {
     domainEntity.latitude = raw.latitude;
     domainEntity.longitude = raw.longitude;
     domainEntity.altitude = raw.altitude;
-    domainEntity.userId = raw.user.id as any;
-    domainEntity.templateSiteId = raw.template?.id as any;
+    domainEntity.userId = raw.user?.id ?? null;
+    domainEntity.templateSiteId = raw.template?.id;
     domainEntity.createdAt = raw.createdAt;
     domainEntity.updatedAt = raw.updatedAt;
+    domainEntity.deletedAt = raw.deletedAt ?? null;
     return domainEntity;
   }
 
@@ -48,18 +49,20 @@ export class SiteMapper {
 
     if (domainEntity.userId) {
       const userEntity = new UserEntity();
-      userEntity.id = domainEntity.userId as any;
+      userEntity.id = domainEntity.userId;
       persistenceEntity.user = userEntity;
     }
 
     if (domainEntity.templateSiteId) {
       const templateSiteEntity = new TemplateSiteEntity();
-      templateSiteEntity.id = domainEntity.templateSiteId as any;
+      templateSiteEntity.id = domainEntity.templateSiteId;
       persistenceEntity.template = templateSiteEntity;
     }
 
     persistenceEntity.createdAt = domainEntity.createdAt;
     persistenceEntity.updatedAt = domainEntity.updatedAt;
+    persistenceEntity.deletedAt = domainEntity.deletedAt ?? null;
+
     return persistenceEntity;
   }
 }

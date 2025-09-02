@@ -1,11 +1,17 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsOptional,
   IsString,
   IsUUID,
   IsNumber,
   ValidateIf,
+  IsEnum,
 } from 'class-validator';
+import {
+  Sunlight,
+  LightType,
+  SoilType,
+} from '../../template-sites/template-sites.enum';
 
 export class CreateSiteDto {
   @ApiProperty({ description: 'Tên địa điểm', required: true })
@@ -13,79 +19,95 @@ export class CreateSiteDto {
   @IsString()
   name?: string;
 
-  @ApiProperty({ required: false, description: 'Mô tả' })
+  @ApiPropertyOptional({ description: 'Mô tả' })
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiProperty({
-    required: false,
-    description: 'Ánh sáng (direct, indirect, ...)',
+  @ApiPropertyOptional({
+    description: 'Ánh sáng nhận được',
+    enum: Sunlight,
   })
   @IsOptional()
-  @IsString()
-  sunlight?: string;
+  @IsEnum(Sunlight)
+  sunlight?: Sunlight;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({
+    description: 'Thời gian chiếu sáng (giờ)',
+    example: 6,
+  })
   @IsOptional()
-  @IsString()
-  lightDuration?: string;
+  @IsNumber()
+  lightDuration?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({
+    description: 'Loại ánh sáng',
+    enum: LightType,
+  })
   @IsOptional()
-  @IsString()
-  lightType?: string;
+  @IsEnum(LightType)
+  lightType?: LightType;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({
+    description: 'Độ ẩm đất (%)',
+    example: 50,
+  })
   @IsOptional()
-  @IsString()
-  soilMoisture?: string;
+  @IsNumber()
+  soilMoisture?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({
+    description: 'Loại đất',
+    enum: SoilType,
+  })
   @IsOptional()
-  @IsString()
-  soilType?: string;
+  @IsEnum(SoilType)
+  soilType?: SoilType;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ description: 'pH của đất', example: 6.5 })
   @IsOptional()
-  @IsString()
-  phSoil?: string;
+  @IsNumber()
+  phSoil?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ description: 'Nhiệt độ trung bình (°C)', example: 28 })
   @IsOptional()
   @IsNumber()
   temperature?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ description: 'Độ ẩm không khí (%)', example: 65 })
   @IsOptional()
   @IsNumber()
   humidity?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ description: 'Mức độ gió (m/s)', example: 3.5 })
   @IsOptional()
-  @IsString()
-  windExposure?: string;
+  @IsNumber()
+  windExposure?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ description: 'Vĩ độ', example: 10.0452 })
   @IsOptional()
   @IsNumber()
   latitude?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ description: 'Kinh độ', example: 105.7469 })
   @IsOptional()
   @IsNumber()
   longitude?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({
+    description: 'Độ cao so với mực nước biển',
+    example: 15,
+  })
   @IsOptional()
   @IsNumber()
   altitude?: number;
 
-  @ApiProperty({ description: 'ID user sở hữu site' })
+  @ApiPropertyOptional({ description: 'ID người dùng sở hữu', example: 'uuid' })
   @IsUUID()
+  @IsOptional()
   userId: string;
 
-  @ApiProperty({ required: false, description: 'ID template site' })
+  @ApiPropertyOptional({ description: 'ID template site' })
   @IsOptional()
   @IsUUID()
   templateSiteId?: string;
