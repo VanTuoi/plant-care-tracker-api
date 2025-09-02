@@ -14,10 +14,14 @@ import {
   FertilizerMethodEnum,
   FertilizerTypeEnum,
 } from '../../../../../fertilizers/fertilizers.enum';
-import { DifficultyLevelEnum, SunlightNeedEnum } from '../../../../plant.enum';
 import { UserEntity } from '../../../../../users/infrastructure/persistence/relational/entities/user.entity';
 import { SpeciesEntity } from '../../../../../species/infrastructure/persistence/relational/entities/species.entity';
 import { SiteEntity } from '../../../../../sites/infrastructure/persistence/relational/entities/site.entity';
+import {
+  DifficultyLevelEnum,
+  SunlightNeedEnum,
+} from '../../../../../species/species.enum';
+import { PlantSizeEnum } from '../../../../plant.enum';
 
 @Entity({ name: 'plant' })
 export class PlantEntity extends EntityRelationalHelper {
@@ -31,14 +35,24 @@ export class PlantEntity extends EntityRelationalHelper {
   @Column({ type: 'varchar', nullable: true })
   scientificName?: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  size?: string;
+  @Column({
+    type: 'enum',
+    enum: PlantSizeEnum,
+    nullable: true,
+  })
+  size?: PlantSizeEnum;
 
-  @Column({ type: 'boolean', nullable: true })
-  inGround?: boolean;
+  @Column({
+    type: 'boolean',
+    default: true,
+  })
+  inGround: boolean;
 
-  @Column({ type: 'boolean', nullable: true })
-  isDead?: boolean;
+  @Column({
+    type: 'boolean',
+    default: false,
+  })
+  isDead: boolean;
 
   @Column({ type: 'int', nullable: true })
   wateringFrequency?: number;

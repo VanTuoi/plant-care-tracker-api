@@ -14,6 +14,7 @@ import {
   SunlightNeedEnum,
 } from '../../../../species/species.enum';
 import { PlantEntity } from '../../../../plants/infrastructure/persistence/relational/entities/plants.entity';
+import { PlantSizeEnum } from '../../../../plants/plant.enum';
 
 @Injectable()
 export class PlantSeedService {
@@ -53,7 +54,7 @@ export class PlantSeedService {
         this.plantRepo.create({
           name: 'Lưỡi Hổ trong vườn',
           scientificName: species.scientificName,
-          size: 'small',
+          size: PlantSizeEnum.MEDIUM,
           inGround: true,
           isDead: false,
           wateringFrequency: 7,
