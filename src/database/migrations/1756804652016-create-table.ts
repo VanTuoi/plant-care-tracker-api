@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateTable1756799108507 implements MigrationInterface {
-  name = 'CreateTable1756799108507';
+export class CreateTable1756804652016 implements MigrationInterface {
+  name = 'CreateTable1756804652016';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -86,6 +86,9 @@ export class CreateTable1756799108507 implements MigrationInterface {
       `CREATE TABLE "site" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "description" character varying, "sunlight" "public"."site_sunlight_enum" DEFAULT 'unknown', "lightDuration" double precision, "lightType" "public"."site_lighttype_enum" DEFAULT 'unknown', "soilMoisture" double precision, "soilType" "public"."site_soiltype_enum" DEFAULT 'unknown', "phSoil" double precision, "temperature" double precision, "humidity" double precision, "windExposure" double precision, "latitude" double precision, "longitude" double precision, "altitude" double precision, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "userId" uuid, "templateId" uuid, CONSTRAINT "PK_635c0eeabda8862d5b0237b42b4" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
+      `CREATE TYPE "public"."plant_size_enum" AS ENUM('tiny', 'small', 'medium', 'large', 'huge')`,
+    );
+    await queryRunner.query(
       `CREATE TYPE "public"."plant_wateringmethod_enum" AS ENUM('root', 'spray', 'immersion', 'drip', 'wick', 'self_watering', 'overhead', 'other')`,
     );
     await queryRunner.query(
@@ -101,7 +104,7 @@ export class CreateTable1756799108507 implements MigrationInterface {
       `CREATE TYPE "public"."plant_difficultylevel_enum" AS ENUM('easy', 'moderate', 'hard')`,
     );
     await queryRunner.query(
-      `CREATE TABLE "plant" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying, "scientificName" character varying, "size" character varying, "inGround" boolean, "isDead" boolean, "wateringFrequency" integer, "wateringAmount" integer, "wateringMethod" "public"."plant_wateringmethod_enum", "fertilizingFrequency" integer, "fertilizingAmount" integer, "fertilizingMethod" "public"."plant_fertilizingmethod_enum", "fertilizerType" "public"."plant_fertilizertype_enum", "sunlightNeed" "public"."plant_sunlightneed_enum", "difficultyLevel" "public"."plant_difficultylevel_enum", "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "plantImageld" uuid, "speciesId" uuid, "userId" uuid, "siteId" uuid, CONSTRAINT "PK_97e1eb0d045aadea59401ece5ba" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "plant" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying, "scientificName" character varying, "size" "public"."plant_size_enum", "inGround" boolean NOT NULL DEFAULT true, "isDead" boolean NOT NULL DEFAULT false, "wateringFrequency" integer, "wateringAmount" integer, "wateringMethod" "public"."plant_wateringmethod_enum", "fertilizingFrequency" integer, "fertilizingAmount" integer, "fertilizingMethod" "public"."plant_fertilizingmethod_enum", "fertilizerType" "public"."plant_fertilizertype_enum", "sunlightNeed" "public"."plant_sunlightneed_enum", "difficultyLevel" "public"."plant_difficultylevel_enum", "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "plantImageld" uuid, "speciesId" uuid, "userId" uuid, "siteId" uuid, CONSTRAINT "PK_97e1eb0d045aadea59401ece5ba" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE INDEX "IDX_06daeb1e9d8c4b6ac7e6bd854e" ON "plant" ("name") `,
@@ -222,6 +225,7 @@ export class CreateTable1756799108507 implements MigrationInterface {
       `DROP TYPE "public"."plant_fertilizingmethod_enum"`,
     );
     await queryRunner.query(`DROP TYPE "public"."plant_wateringmethod_enum"`);
+    await queryRunner.query(`DROP TYPE "public"."plant_size_enum"`);
     await queryRunner.query(`DROP TABLE "site"`);
     await queryRunner.query(`DROP TYPE "public"."site_soiltype_enum"`);
     await queryRunner.query(`DROP TYPE "public"."site_lighttype_enum"`);

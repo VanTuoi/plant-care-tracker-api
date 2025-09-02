@@ -12,8 +12,12 @@ import {
   FertilizerMethodEnum,
   FertilizerTypeEnum,
 } from '../../fertilizers/fertilizers.enum';
-import { DifficultyLevelEnum, SunlightNeedEnum } from '../plant.enum';
+import {
+  DifficultyLevelEnum,
+  SunlightNeedEnum,
+} from '../../species/species.enum';
 import { Transform } from 'class-transformer';
+import { PlantSizeEnum } from '../plant.enum';
 
 export class CreatePlantDto {
   @ApiPropertyOptional({ description: 'Tên cây', example: 'Hoa Hồng Đỏ' })
@@ -29,20 +33,32 @@ export class CreatePlantDto {
   @IsString()
   scientificName?: string;
 
-  @ApiPropertyOptional({ description: 'Kích thước cây', example: 'medium' })
+  @ApiPropertyOptional({
+    description: 'Kích thước cây',
+    enum: PlantSizeEnum,
+    example: PlantSizeEnum.MEDIUM,
+  })
+  @IsEnum(PlantSizeEnum)
   @IsOptional()
-  @IsString()
-  size?: string;
+  size?: PlantSizeEnum;
 
-  @ApiPropertyOptional({ description: 'Cây trồng trong đất', example: true })
-  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'Cây được trồng trong đất hay không',
+    example: true,
+    default: true,
+  })
   @IsBoolean()
-  inGround?: boolean;
+  @IsOptional()
+  inGround: boolean = true;
 
-  @ApiPropertyOptional({ description: 'Cây đã chết', example: false })
-  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'Cây đã chết hay chưa',
+    example: false,
+    default: false,
+  })
   @IsBoolean()
-  isDead?: boolean;
+  @IsOptional()
+  isDead: boolean = false;
 
   @ApiPropertyOptional({ description: 'Tần suất tưới (số ngày)', example: 3 })
   @IsOptional()
