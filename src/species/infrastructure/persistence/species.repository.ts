@@ -1,11 +1,8 @@
-import { DeepPartial } from '../../../../utils/types/deep-partial.type';
-import { NullableType } from '../../../../utils/types/nullable.type';
-import { Species } from '../../../domain/species';
-import { IPaginationOptions } from '../../../../utils/types/pagination-options';
-import {
-  FilterSpeciesDto,
-  SortSpeciesDto,
-} from '../../../dto/query-species.dto';
+import { DeepPartial } from '../../../utils/types/deep-partial.type';
+import { NullableType } from '../../../utils/types/nullable.type';
+import { Species } from '../../domain/species';
+import { IPaginationOptions } from '../../../utils/types/pagination-options';
+import { FilterSpeciesDto, SortSpeciesDto } from '../../dto/query-species.dto';
 
 export abstract class SpeciesRepository {
   abstract create(

@@ -6,4 +6,5 @@ export enum WaterEnum {
   WICK = 'wick',
   SELF_WATERING = 'self_watering',
   OVERHEAD = 'overhead',
+  OTHER = 'other',
 }

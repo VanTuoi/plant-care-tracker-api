@@ -1,68 +1,114 @@
 import { Injectable } from '@nestjs/common';
-import { PlantRepository } from '../plants.repository';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, In, FindOptionsWhere } from 'typeorm';
+
+import { PlantEntity } from '../entities/plants.entity';
+import { Plant } from '../../../../domain/plant';
+import { PlantMapper } from '../mappers/plant.mapper';
+import { PlantRepository } from '../../plants.repository';
+import { NullableType } from '../../../../../utils/types/nullable.type';
+import { FilterPlantDto, SortPlantDto } from '../../../../dto/query-plant.dto';
+import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
 
 @Injectable()
 export class PlantsRelationalRepository implements PlantRepository {
-  async create(): Promise<any> {
-    await Promise.resolve();
-    throw new Error('Not implemented');
+  constructor(
+    @InjectRepository(PlantEntity)
+    private readonly plantsRepository: Repository<PlantEntity>,
+  ) {}
+
+  async create(data: Plant): Promise<Plant> {
+    const persistenceModel = PlantMapper.toPersistence(data);
+    const newEntity = await this.plantsRepository.save(
+      this.plantsRepository.create(persistenceModel),
+    );
+    return PlantMapper.toDomain(newEntity);
   }
 
-  async findManyWithPagination(): Promise<any[]> {
-    await Promise.resolve();
-    return [];
+  async findManyWithPagination({
+    filterOptions,
+    sortOptions,
+    paginationOptions,
+  }: {
+    filterOptions?: FilterPlantDto | null;
+    sortOptions?: SortPlantDto[] | null;
+    paginationOptions: IPaginationOptions;
+  }): Promise<Plant[]> {
+    const where: FindOptionsWhere<PlantEntity> = {};
+
+    if (filterOptions?.speciesId)
+      where.species = { id: filterOptions.speciesId };
+    if (filterOptions?.siteId) where.site = { id: filterOptions.siteId };
+    if (filterOptions?.userId) where.user = { id: filterOptions.userId };
+    if (filterOptions?.name) where.name = filterOptions.name;
+
+    const entities = await this.plantsRepository.find({
+      skip: (paginationOptions.page - 1) * paginationOptions.limit,
+      take: paginationOptions.limit,
+      where,
+      order: sortOptions?.reduce(
+        (acc, sort) => ({ ...acc, [sort.orderBy]: sort.order }),
+        {},
+      ),
+      relations: ['species', 'user', 'site'],
+    });
+
+    return entities.map((plant) => PlantMapper.toDomain(plant));
   }
 
-  async findById(): Promise<any> {
-    await Promise.resolve();
-    return {
-      id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-      name: 'Hoa Hồng Đỏ',
-      scientificName: 'Rosa rubiginosa',
-      size: 'medium',
-      inGround: true,
-      isDead: false,
-      wateringFrequency: '3 days',
-      wateringAmount: '500ml',
-      wateringMethod: 'root watering',
-      fertilizingFrequency: '2 weeks',
-      fertilizingAmount: '100g',
-      fertilizingMethod: 'soil mixing',
-      fertilizerType: 'organic',
-      sunlightNeed: 'full sun',
-      difficultyLevel: 'moderate',
-      createdAt: '2023-05-15T08:30:00Z',
-      updatedAt: '2023-06-20T14:25:00Z',
-      deletedAt: null,
-      speciesId: 'SP#f1e2d3c4-b5a6-7890-fedc-ba9876543210',
-      plantImageld: 'IMG#c3b2a1d4-e6f5-7890-cdef-ab4567890123',
-      userId: '4f520d8a-62ec-43a9-8162-71713ae41563',
-      siteId: 'SITE#b2a1c3d4-e6f5-7890-abcd-ef5678901234',
-    };
+  async findById(id: Plant['id']): Promise<NullableType<Plant>> {
+    const entity = await this.plantsRepository.findOne({
+      where: { id },
+      relations: ['species', 'user', 'site'],
+    });
+    return entity ? PlantMapper.toDomain(entity) : null;
   }
 
-  async findByIds(): Promise<any[]> {
-    await Promise.resolve();
-    return [];
+  async findByIds(ids: Plant['id'][]): Promise<Plant[]> {
+    const entities = await this.plantsRepository.find({
+      where: { id: In(ids) },
+      relations: ['species', 'user', 'site'],
+    });
+    return entities.map((plant) => PlantMapper.toDomain(plant));
   }
 
-  async update(): Promise<any | null> {
-    await Promise.resolve();
-    return null;
+  async update(
+    id: Plant['id'],
+    payload: Partial<Plant>,
+  ): Promise<Plant | null> {
+    const entity = await this.plantsRepository.findOne({ where: { id } });
+    if (!entity) return null;
+
+    const updatedEntity = await this.plantsRepository.save(
+      this.plantsRepository.create(
+        PlantMapper.toPersistence({
+          ...PlantMapper.toDomain(entity),
+          ...payload,
+        }),
+      ),
+    );
+    return PlantMapper.toDomain(updatedEntity);
   }
 
-  async remove(): Promise<void> {
-    await Promise.resolve();
-    return;
+  async remove(id: Plant['id']): Promise<void> {
+    await this.plantsRepository.softDelete(id);
   }
 
-  async findByPlantIds(): Promise<any[]> {
-    await Promise.resolve();
-    return [];
+  async findByPlantIds(ids: Plant['id'][]): Promise<Plant[]> {
+    const entities = await this.plantsRepository.find({
+      where: { id: In(ids) },
+      relations: ['species', 'user', 'site'],
+    });
+    return entities.map((plant) => PlantMapper.toDomain(plant));
   }
 
-  async findByUserId(): Promise<any[]> {
-    await Promise.resolve();
-    return [];
+  async findByUserId(userId: string): Promise<Plant[]> {
+    const entities = await this.plantsRepository.find({
+      where: {
+        user: { id: userId },
+      },
+      relations: ['species', 'user', 'site'],
+    });
+    return entities.map((plant) => PlantMapper.toDomain(plant));
   }
 }

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SpeciesEntity } from './infrastructure/persistence/relational/entities/species.entity';
-import { SpeciesRepository } from './infrastructure/persistence/relational/species.repository';
+import { SpeciesRepository } from './infrastructure/persistence/species.repository';
 import { SpeciesRelationalRepository } from './infrastructure/persistence/relational/repositories/species.repository';
 import { RelationalSpeciesPersistenceModule } from './infrastructure/persistence/relational/relational-persistence.module';
 import { SpeciesController } from './species.controller';

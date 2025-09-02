@@ -10,6 +10,15 @@ import {
 } from 'typeorm';
 import { FileEntity } from '../../../../../files/infrastructure/persistence/relational/entities/file.entity';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
+import { WaterEnum } from '../../../../../waters/waters.enum';
+import {
+  FertilizerMethodEnum,
+  FertilizerTypeEnum,
+} from '../../../../../fertilizers/fertilizers.enum';
+import {
+  DifficultyLevelEnum,
+  SunlightNeedEnum,
+} from '../../../../species.enum';
 
 @Entity('species')
 export class SpeciesEntity extends EntityRelationalHelper {
@@ -33,8 +42,8 @@ export class SpeciesEntity extends EntityRelationalHelper {
   @Column({ type: 'int', nullable: true })
   wateringAmount?: number;
 
-  @Column({ type: 'varchar', nullable: true })
-  wateringMethod?: string;
+  @Column({ type: 'enum', enum: WaterEnum, nullable: true })
+  wateringMethod?: WaterEnum;
 
   @Column({ type: 'int', nullable: true })
   fertilizingFrequency?: number;
@@ -42,24 +51,24 @@ export class SpeciesEntity extends EntityRelationalHelper {
   @Column({ type: 'int', nullable: true })
   fertilizingAmount?: number;
 
-  @Column({ type: 'varchar', nullable: true })
-  fertilizingMethod?: string;
+  @Column({ type: 'enum', enum: FertilizerMethodEnum, nullable: true })
+  fertilizingMethod?: FertilizerMethodEnum;
 
-  @Column({ type: 'varchar', nullable: true })
-  fertilizerType?: string;
+  @Column({ type: 'enum', enum: FertilizerTypeEnum, nullable: true })
+  fertilizerType?: FertilizerTypeEnum;
 
-  @Column({ type: 'varchar', nullable: true })
-  sunlightNeed?: string;
+  @Column({ type: 'enum', enum: SunlightNeedEnum, nullable: true })
+  sunlightNeed?: SunlightNeedEnum;
 
-  @Column({ type: 'varchar', nullable: true })
-  difficultyLevel?: string;
+  @Column({ type: 'enum', enum: DifficultyLevelEnum, nullable: true })
+  difficultyLevel?: DifficultyLevelEnum;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
-  @DeleteDateColumn()
+  @DeleteDateColumn({ type: 'timestamptz' })
   deletedAt: Date;
 }

@@ -1,6 +1,18 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsOptional, IsNumber, IsUUID } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsUUID,
+  IsEnum,
+} from 'class-validator';
 
+import { DifficultyLevelEnum, SunlightNeedEnum } from '../species.enum';
+import { WaterEnum } from '../../waters/waters.enum';
+import {
+  FertilizerMethodEnum,
+  FertilizerTypeEnum,
+} from '../../fertilizers/fertilizers.enum';
 export class CreateSpeciesDto {
   @ApiProperty({ description: 'Tên thông thường của loài', example: 'Lưỡi Hổ' })
   @IsString()
@@ -30,11 +42,12 @@ export class CreateSpeciesDto {
 
   @ApiPropertyOptional({
     description: 'Phương pháp tưới',
-    example: 'tưới gốc, phun sương',
+    enum: WaterEnum,
+    example: WaterEnum.ROOT,
   })
   @IsOptional()
-  @IsString()
-  wateringMethod?: string;
+  @IsEnum(WaterEnum)
+  wateringMethod?: WaterEnum;
 
   @ApiPropertyOptional({
     description: 'Tần suất bón phân (lần/tháng)',
@@ -51,30 +64,37 @@ export class CreateSpeciesDto {
 
   @ApiPropertyOptional({
     description: 'Phương pháp bón phân',
-    example: 'bón gốc, phun lá',
+    enum: FertilizerMethodEnum,
+    example: FertilizerMethodEnum.SOIL_MIXING,
   })
   @IsOptional()
-  @IsString()
-  fertilizingMethod?: string;
+  @IsEnum(FertilizerMethodEnum)
+  fertilizingMethod?: FertilizerMethodEnum;
 
-  @ApiPropertyOptional({ description: 'Loại phân bón', example: 'NPK, hữu cơ' })
+  @ApiPropertyOptional({
+    description: 'Loại phân bón',
+    enum: FertilizerTypeEnum,
+    example: FertilizerTypeEnum.ORGANIC,
+  })
   @IsOptional()
-  @IsString()
-  fertilizerType?: string;
+  @IsEnum(FertilizerTypeEnum)
+  fertilizerType?: FertilizerTypeEnum;
 
   @ApiPropertyOptional({
     description: 'Nhu cầu ánh sáng',
-    example: 'full_sun, partial_shade',
+    enum: SunlightNeedEnum,
+    example: SunlightNeedEnum.FULL_SUN,
   })
   @IsOptional()
-  @IsString()
-  sunlightNeed?: string;
+  @IsEnum(SunlightNeedEnum)
+  sunlightNeed?: SunlightNeedEnum;
 
   @ApiPropertyOptional({
     description: 'Mức độ khó chăm sóc',
-    example: 'dễ, trung bình, khó',
+    enum: DifficultyLevelEnum,
+    example: DifficultyLevelEnum.EASY,
   })
   @IsOptional()
-  @IsString()
-  difficultyLevel?: string;
+  @IsEnum(DifficultyLevelEnum)
+  difficultyLevel?: DifficultyLevelEnum;
 }
