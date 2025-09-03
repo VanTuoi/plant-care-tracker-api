@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateTable1756829332647 implements MigrationInterface {
-  name = 'CreateTable1756829332647';
+export class CreateTable1756879282867 implements MigrationInterface {
+  name = 'CreateTable1756879282867';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -146,6 +146,15 @@ export class CreateTable1756829332647 implements MigrationInterface {
       `CREATE TABLE "fertilizer" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "note" text, "fertilizerType" "public"."fertilizer_fertilizertype_enum" NOT NULL, "amount" integer NOT NULL, "method" "public"."fertilizer_method_enum" NOT NULL, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "plantId" uuid, CONSTRAINT "PK_3d0704e83bef3b07de441b2f47a" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
+      `CREATE TYPE "public"."growth_diary_mood_enum" AS ENUM('happy', 'sad', 'neutral', 'angry', 'other')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "growth_diary" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "plantId" uuid NOT NULL, "fileId" uuid, "note" text, "mood" "public"."growth_diary_mood_enum", "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, CONSTRAINT "REL_e3fb2de2c8eb486e26b28061b5" UNIQUE ("fileId"), CONSTRAINT "PK_3df2ded1759fdf943517a130411" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_46fd269e18704c161dfeecd60f" ON "growth_diary" ("plantId") `,
+    );
+    await queryRunner.query(
       `ALTER TABLE "user" ADD CONSTRAINT "FK_75e2be4ce11d447ef43be0e374f" FOREIGN KEY ("photoId") REFERENCES "file"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
     await queryRunner.query(
@@ -187,9 +196,21 @@ export class CreateTable1756829332647 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "fertilizer" ADD CONSTRAINT "FK_d9585ff33f254a4c346aed2dace" FOREIGN KEY ("plantId") REFERENCES "plant"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
+    await queryRunner.query(
+      `ALTER TABLE "growth_diary" ADD CONSTRAINT "FK_46fd269e18704c161dfeecd60f6" FOREIGN KEY ("plantId") REFERENCES "plant"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "growth_diary" ADD CONSTRAINT "FK_e3fb2de2c8eb486e26b28061b5c" FOREIGN KEY ("fileId") REFERENCES "file"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `ALTER TABLE "growth_diary" DROP CONSTRAINT "FK_e3fb2de2c8eb486e26b28061b5c"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "growth_diary" DROP CONSTRAINT "FK_46fd269e18704c161dfeecd60f6"`,
+    );
     await queryRunner.query(
       `ALTER TABLE "fertilizer" DROP CONSTRAINT "FK_d9585ff33f254a4c346aed2dace"`,
     );
@@ -232,6 +253,11 @@ export class CreateTable1756829332647 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "user" DROP CONSTRAINT "FK_75e2be4ce11d447ef43be0e374f"`,
     );
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_46fd269e18704c161dfeecd60f"`,
+    );
+    await queryRunner.query(`DROP TABLE "growth_diary"`);
+    await queryRunner.query(`DROP TYPE "public"."growth_diary_mood_enum"`);
     await queryRunner.query(`DROP TABLE "fertilizer"`);
     await queryRunner.query(`DROP TYPE "public"."fertilizer_method_enum"`);
     await queryRunner.query(

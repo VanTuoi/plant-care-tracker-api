@@ -28,6 +28,7 @@ import { FertilizersModule } from './fertilizers/fertilizers.module';
 import { PlantsModule } from './plants/plants.module';
 import { TemplateSitesModule } from './template-sites/template-sites.module';
 import { PlantImageModule } from './plant-image/plant-image.module';
+import { GrowthDiaryModule } from './growth-diaries/growth-diaries.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -88,6 +89,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     SpeciesModule,
     PlantsModule,
     PlantImageModule,
+    GrowthDiaryModule,
     WatersModule,
     FertilizersModule,
   ],
