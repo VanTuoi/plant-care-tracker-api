@@ -71,6 +71,28 @@ export class PlantSeedService {
           species,
         }),
       );
+
+      await this.plantRepo.save(
+        this.plantRepo.create({
+          name: 'Lưỡi Hổ trong vườn 2',
+          scientificName: species.scientificName,
+          size: PlantSizeEnum.MEDIUM,
+          inGround: false,
+          isDead: false,
+          wateringFrequency: 7,
+          wateringAmount: 200,
+          wateringMethod: WaterEnum.ROOT,
+          fertilizingFrequency: 30,
+          fertilizingAmount: 50,
+          fertilizingMethod: FertilizerMethodEnum.SOIL_MIXING,
+          fertilizerType: FertilizerTypeEnum.ORGANIC,
+          sunlightNeed: SunlightNeedEnum.PARTIAL_SUN,
+          difficultyLevel: DifficultyLevelEnum.EASY,
+          user,
+          site,
+          species,
+        }),
+      );
     }
   }
 }
