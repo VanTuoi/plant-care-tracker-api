@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateTable1756813930564 implements MigrationInterface {
-  name = 'CreateTable1756813930564';
+export class CreateTable1756829332647 implements MigrationInterface {
+  name = 'CreateTable1756829332647';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -86,6 +86,12 @@ export class CreateTable1756813930564 implements MigrationInterface {
       `CREATE TABLE "site" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "description" character varying, "sunlight" "public"."site_sunlight_enum" DEFAULT 'unknown', "lightDuration" double precision, "lightType" "public"."site_lighttype_enum" DEFAULT 'unknown', "soilMoisture" double precision, "soilType" "public"."site_soiltype_enum" DEFAULT 'unknown', "phSoil" double precision, "temperature" double precision, "humidity" double precision, "windExposure" double precision, "latitude" double precision, "longitude" double precision, "altitude" double precision, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "userId" uuid, "templateId" uuid, CONSTRAINT "PK_635c0eeabda8862d5b0237b42b4" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
+      `CREATE TABLE "plant_image" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "plantId" uuid NOT NULL, "fileId" uuid NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, CONSTRAINT "PK_e3d2712c8418566a269e09c32b1" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_c4f4022812be0b878d48ca7542" ON "plant_image" ("plantId") `,
+    );
+    await queryRunner.query(
       `CREATE TYPE "public"."plant_size_enum" AS ENUM('tiny', 'small', 'medium', 'large', 'huge')`,
     );
     await queryRunner.query(
@@ -104,7 +110,7 @@ export class CreateTable1756813930564 implements MigrationInterface {
       `CREATE TYPE "public"."plant_difficultylevel_enum" AS ENUM('easy', 'moderate', 'hard')`,
     );
     await queryRunner.query(
-      `CREATE TABLE "plant" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying, "scientificName" character varying, "size" "public"."plant_size_enum", "inGround" boolean NOT NULL DEFAULT true, "isDead" boolean NOT NULL DEFAULT false, "wateringFrequency" integer, "wateringAmount" integer, "wateringMethod" "public"."plant_wateringmethod_enum", "fertilizingFrequency" integer, "fertilizingAmount" integer, "fertilizingMethod" "public"."plant_fertilizingmethod_enum", "fertilizerType" "public"."plant_fertilizertype_enum", "sunlightNeed" "public"."plant_sunlightneed_enum", "difficultyLevel" "public"."plant_difficultylevel_enum", "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "plantImageld" uuid, "speciesId" uuid, "userId" uuid, "siteId" uuid, CONSTRAINT "PK_97e1eb0d045aadea59401ece5ba" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "plant" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying, "scientificName" character varying, "size" "public"."plant_size_enum", "inGround" boolean NOT NULL DEFAULT true, "isDead" boolean NOT NULL DEFAULT false, "wateringFrequency" integer, "wateringAmount" integer, "wateringMethod" "public"."plant_wateringmethod_enum", "fertilizingFrequency" integer, "fertilizingAmount" integer, "fertilizingMethod" "public"."plant_fertilizingmethod_enum", "fertilizerType" "public"."plant_fertilizertype_enum", "sunlightNeed" "public"."plant_sunlightneed_enum", "difficultyLevel" "public"."plant_difficultylevel_enum", "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "speciesId" uuid, "userId" uuid, "siteId" uuid, CONSTRAINT "PK_97e1eb0d045aadea59401ece5ba" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE INDEX "IDX_06daeb1e9d8c4b6ac7e6bd854e" ON "plant" ("name") `,
@@ -158,6 +164,12 @@ export class CreateTable1756813930564 implements MigrationInterface {
       `ALTER TABLE "site" ADD CONSTRAINT "FK_791bdfe69779af31d88b1996d28" FOREIGN KEY ("templateId") REFERENCES "template_site"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
     await queryRunner.query(
+      `ALTER TABLE "plant_image" ADD CONSTRAINT "FK_c4f4022812be0b878d48ca75420" FOREIGN KEY ("plantId") REFERENCES "plant"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "plant_image" ADD CONSTRAINT "FK_bf53a1e321b05ad5abf867358df" FOREIGN KEY ("fileId") REFERENCES "file"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
       `ALTER TABLE "plant" ADD CONSTRAINT "FK_7778484944052d972e129fea871" FOREIGN KEY ("speciesId") REFERENCES "species"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
     await queryRunner.query(
@@ -195,6 +207,12 @@ export class CreateTable1756813930564 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE "plant" DROP CONSTRAINT "FK_7778484944052d972e129fea871"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "plant_image" DROP CONSTRAINT "FK_bf53a1e321b05ad5abf867358df"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "plant_image" DROP CONSTRAINT "FK_c4f4022812be0b878d48ca75420"`,
     );
     await queryRunner.query(
       `ALTER TABLE "site" DROP CONSTRAINT "FK_791bdfe69779af31d88b1996d28"`,
@@ -246,6 +264,10 @@ export class CreateTable1756813930564 implements MigrationInterface {
     );
     await queryRunner.query(`DROP TYPE "public"."plant_wateringmethod_enum"`);
     await queryRunner.query(`DROP TYPE "public"."plant_size_enum"`);
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_c4f4022812be0b878d48ca7542"`,
+    );
+    await queryRunner.query(`DROP TABLE "plant_image"`);
     await queryRunner.query(`DROP TABLE "site"`);
     await queryRunner.query(`DROP TYPE "public"."site_soiltype_enum"`);
     await queryRunner.query(`DROP TYPE "public"."site_lighttype_enum"`);

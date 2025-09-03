@@ -3,6 +3,7 @@ import { PlantEntity } from '../entities/plants.entity';
 import { UserEntity } from '../../../../../users/infrastructure/persistence/relational/entities/user.entity';
 import { SiteEntity } from '../../../../../sites/infrastructure/persistence/relational/entities/site.entity';
 import { SpeciesEntity } from '../../../../../species/infrastructure/persistence/relational/entities/species.entity';
+import { PlantImageMapper } from '../../../../../plant-image/infrastructure/persistence/relational/mappers/plant-image.mapper';
 
 export class PlantMapper {
   static toDomain(raw: PlantEntity): Plant {
@@ -30,7 +31,7 @@ export class PlantMapper {
     domainEntity.userId = raw.user?.id;
     domainEntity.siteId = raw.site?.id;
 
-    domainEntity.plantImageld = raw.plantImageld;
+    domainEntity.images = raw.images?.map(PlantImageMapper.toDomain);
 
     return domainEntity;
   }
@@ -77,8 +78,6 @@ export class PlantMapper {
       siteEntity.id = domainEntity.siteId;
       persistenceEntity.site = siteEntity;
     }
-
-    persistenceEntity.plantImageld = domainEntity.plantImageld;
 
     return persistenceEntity;
   }
