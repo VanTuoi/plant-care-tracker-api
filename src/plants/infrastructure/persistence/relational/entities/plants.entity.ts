@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 import { WaterEnum } from '../../../../../waters/waters.enum';
@@ -22,6 +23,7 @@ import {
   SunlightNeedEnum,
 } from '../../../../../species/species.enum';
 import { PlantSizeEnum } from '../../../../plant.enum';
+import { PlantImageEntity } from '../../../../../plant-image/infrastructure/persistence/relational/entities/plant-image.entity';
 
 @Entity({ name: 'plant' })
 export class PlantEntity extends EntityRelationalHelper {
@@ -114,8 +116,8 @@ export class PlantEntity extends EntityRelationalHelper {
   @Index()
   species?: SpeciesEntity;
 
-  @Column({ type: 'uuid', nullable: true })
-  plantImageld?: string;
+  @OneToMany(() => PlantImageEntity, (image) => image.plant, { eager: true })
+  images?: PlantImageEntity[];
 
   @ManyToOne(() => UserEntity, { eager: true })
   @Index()

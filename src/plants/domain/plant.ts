@@ -18,6 +18,7 @@ import {
 } from '../../species/species.enum';
 import { Type } from 'class-transformer';
 import { PlantSizeEnum } from '../plant.enum';
+import { PlantImage } from '../../plant-image/domain/plant-image';
 
 export class Plant {
   @ApiProperty({
@@ -165,12 +166,11 @@ export class Plant {
   speciesId?: string;
 
   @ApiPropertyOptional({
-    description: 'ID hình ảnh cây',
-    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    description: 'Danh sách tất cả ảnh của cây',
+    type: () => [PlantImage],
   })
-  @IsString()
   @IsOptional()
-  plantImageld?: string;
+  images?: PlantImage[];
 
   @ApiPropertyOptional({
     description: 'ID người dùng sở hữu cây',

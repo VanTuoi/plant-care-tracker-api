@@ -27,6 +27,7 @@ import { WatersModule } from './waters/waters.module';
 import { FertilizersModule } from './fertilizers/fertilizers.module';
 import { PlantsModule } from './plants/plants.module';
 import { TemplateSitesModule } from './template-sites/template-sites.module';
+import { PlantImageModule } from './plant-image/plant-image.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -86,6 +87,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     SitesModule,
     SpeciesModule,
     PlantsModule,
+    PlantImageModule,
     WatersModule,
     FertilizersModule,
   ],
