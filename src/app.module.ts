@@ -19,8 +19,6 @@ import { HomeModule } from './home/home.module';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
-import { NotifierModule } from './notifier/notifier.module';
-import { CalendarReminderModule } from './calendar-reminder/calendar-reminder.module';
 import { SitesModule } from './sites/sites.module';
 import { SpeciesModule } from './species/species.module';
 import { WatersModule } from './waters/waters.module';
@@ -29,6 +27,10 @@ import { PlantsModule } from './plants/plants.module';
 import { TemplateSitesModule } from './template-sites/template-sites.module';
 import { PlantImageModule } from './plant-image/plant-image.module';
 import { GrowthDiaryModule } from './growth-diaries/growth-diaries.module';
+import { ReminderOptionsModule } from './reminder-options/reminder-options.module';
+import { NotificationLogsModule } from './notification-logs/notification-logs.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { NotifierModule } from './notifier/notifier.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -82,7 +84,6 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     FilesModule,
     MailModule,
     NotifierModule,
-    CalendarReminderModule,
     HomeModule,
     TemplateSitesModule,
     SitesModule,
@@ -92,6 +93,9 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     GrowthDiaryModule,
     WatersModule,
     FertilizersModule,
+    ReminderOptionsModule,
+    NotificationsModule,
+    NotificationLogsModule,
   ],
 })
 export class AppModule {}

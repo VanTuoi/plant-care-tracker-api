@@ -13,12 +13,14 @@ import { TemplateSiteSeedModule } from './template-site/template-site-seed.modul
 import { SiteSeedModule } from './sites/site-seed.module';
 import { SpeciesSeedModule } from './species/species-seed.module';
 import { PlantSeedModule } from './plants/plants-seed.module';
+import { ReminderOptionSeedModule } from './reminder-option/reminder-option.module';
 
 @Module({
   imports: [
     RoleSeedModule,
     StatusSeedModule,
     UserSeedModule,
+    ReminderOptionSeedModule,
     TemplateSiteSeedModule,
     SiteSeedModule,
     SpeciesSeedModule,

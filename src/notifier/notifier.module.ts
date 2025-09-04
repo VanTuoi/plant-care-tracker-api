@@ -1,39 +1,27 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { MailerModule } from './mailer/mailer.module';
-import { WsModule } from './ws/ws.module';
-import { NotifierService } from './application/services/notifier.service';
-import { NotificationTypeOrmRepository } from './infrastructure/persistence/notification.repository.impl';
-import { NotificationChannelTypeOrmRepository } from './infrastructure/persistence/notification-channel.repository.impl';
-import { NotificationOrmEntity } from './infrastructure/persistence/notification.entity';
-import { NotificationChannelOrmEntity } from './infrastructure/persistence/notification-channel.entity';
-import { MailNotificationService } from './infrastructure/channels/mail-notification.service';
-import { WsNotificationChannelService } from './infrastructure/channels/ws-notification.service';
+import { WsModule } from '../websockets/ws.module';
+import { NotificationDispatcherService } from './notifier.service';
+import { NotificationDispatcherController } from './notifier.controller';
+import { ReminderOptionsModule } from '../reminder-options/reminder-options.module';
+import { PlantsModule } from '../plants/plants.module';
+import { UsersModule } from '../users/users.module';
+import { NotificationLogsModule } from '../notification-logs/notification-logs.module';
+import { NotificationsModule } from '../notifications/notifications.module';
+import { RedisPubSubService } from '../websockets/redis-pubsub.service';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
-    MailerModule,
+    MailModule,
     WsModule,
-    TypeOrmModule.forFeature([
-      NotificationOrmEntity,
-      NotificationChannelOrmEntity,
-    ]),
+    ReminderOptionsModule,
+    PlantsModule,
+    UsersModule,
+    NotificationLogsModule,
+    NotificationsModule,
   ],
-  providers: [
-    NotifierService,
-    NotificationTypeOrmRepository,
-    NotificationChannelTypeOrmRepository,
-    MailNotificationService,
-    WsNotificationChannelService,
-    {
-      provide: 'NOTIFICATION_CHANNELS',
-      useFactory: (
-        mail: MailNotificationService,
-        ws: WsNotificationChannelService,
-      ) => [mail, ws],
-      inject: [MailNotificationService, WsNotificationChannelService],
-    },
-  ],
-  exports: [NotifierService],
+  providers: [NotificationDispatcherService, RedisPubSubService],
+  controllers: [NotificationDispatcherController],
+  exports: [NotificationDispatcherService],
 })
 export class NotifierModule {}

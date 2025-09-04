@@ -18,12 +18,14 @@ import { FileType } from '../files/domain/file';
 import { Role } from '../roles/domain/role';
 import { Status } from '../statuses/domain/status';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ReminderOptionsService } from '../reminder-options/reminder-options.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly usersRepository: UserRepository,
     private readonly filesService: FilesService,
+    private readonly reminderOptionsService: ReminderOptionsService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -113,7 +115,7 @@ export class UsersService {
       };
     }
 
-    return this.usersRepository.create({
+    const user = await this.usersRepository.create({
       // Do not remove comment below.
       // <creating-property-payload />
       firstName: createUserDto.firstName,
@@ -126,6 +128,10 @@ export class UsersService {
       provider: createUserDto.provider ?? AuthProvidersEnum.email,
       socialId: createUserDto.socialId,
     });
+
+    await this.reminderOptionsService.createForUser({ userId: user.id });
+
+    return user;
   }
 
   findManyWithPagination({

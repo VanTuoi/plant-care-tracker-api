@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <style>
+    body {
+      font-family: 'Helvetica', 'Arial', sans-serif;
+      background-color: #f4f6f8;
+      color: #333;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      color: #2c7a7b;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 16px;
+      margin: 12px 0;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #38a169;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .button:hover {
+      background-color: #2f855a;
+    }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #888;
+      text-align: center;
+    }
+
+    .btn {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    b {
+      color: #2d3748;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>{{title}}</h1>
+    <p>Xin chào,</p>
+    <p>Đã đến lúc bạn cần chăm sóc cho cây: <b>{{plantName}}</b>.</p>
+    <p>Lịch nhắc: {{schedule}}</p>
+
+    {{#if actionTitle}}
+      <div class="btn">
+        <a href="#" class="button">{{actionTitle}}</a>
+      </div>
+    {{/if}}
+
+    <p class="footer">Cảm ơn bạn đã sử dụng {{app_name}} 🌱</p>
+  </div>
+</body>
+</html>

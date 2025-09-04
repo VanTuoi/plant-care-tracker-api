@@ -2,15 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { I18nContext } from 'nestjs-i18n';
 import { MailData } from './interfaces/mail-data.interface';
+
 import { MaybeType } from '../utils/types/maybe.type';
 import path from 'path';
 import { AllConfigType } from '../config/config.type';
-import { NotifierService } from '../notifier/application/services/notifier.service';
+import { MailerService } from '../mailer/mailer.service';
 
 @Injectable()
 export class MailService {
   constructor(
-    private readonly notifier: NotifierService,
+    private readonly mailerService: MailerService,
     private readonly configService: ConfigService<AllConfigType>,
   ) {}
 
@@ -31,12 +32,13 @@ export class MailService {
     }
 
     const url = new URL(
-      this.configService.getOrThrow('app.frontendDomain', { infer: true }) +
-        '/confirm-email',
+      this.configService.getOrThrow('app.frontendDomain', {
+        infer: true,
+      }) + '/confirm-email',
     );
     url.searchParams.set('hash', mailData.data.hash);
 
-    await this.notifier.notifyUserByEmail({
+    await this.mailerService.sendMail({
       to: mailData.to,
       subject: emailConfirmTitle,
       text: `${url.toString()} ${emailConfirmTitle}`,
@@ -82,13 +84,14 @@ export class MailService {
     }
 
     const url = new URL(
-      this.configService.getOrThrow('app.frontendDomain', { infer: true }) +
-        '/password-change',
+      this.configService.getOrThrow('app.frontendDomain', {
+        infer: true,
+      }) + '/password-change',
     );
     url.searchParams.set('hash', mailData.data.hash);
     url.searchParams.set('expires', mailData.data.tokenExpires.toString());
 
-    await this.notifier.notifyUserByEmail({
+    await this.mailerService.sendMail({
       to: mailData.to,
       subject: resetPasswordTitle,
       text: `${url.toString()} ${resetPasswordTitle}`,
@@ -112,23 +115,7 @@ export class MailService {
         text2,
         text3,
         text4,
-        imageCid: 'logo@cid',
       },
-      attachments: [
-        {
-          filename: 'logo.png',
-          path: path.join(
-            this.configService.getOrThrow('app.workingDirectory', {
-              infer: true,
-            }),
-            'src',
-            'mail',
-            'assets',
-            'logo.png',
-          ),
-          cid: 'logo@cid',
-        },
-      ],
     });
   }
 
@@ -149,12 +136,13 @@ export class MailService {
     }
 
     const url = new URL(
-      this.configService.getOrThrow('app.frontendDomain', { infer: true }) +
-        '/confirm-new-email',
+      this.configService.getOrThrow('app.frontendDomain', {
+        infer: true,
+      }) + '/confirm-new-email',
     );
     url.searchParams.set('hash', mailData.data.hash);
 
-    await this.notifier.notifyUserByEmail({
+    await this.mailerService.sendMail({
       to: mailData.to,
       subject: emailConfirmTitle,
       text: `${url.toString()} ${emailConfirmTitle}`,
@@ -179,27 +167,41 @@ export class MailService {
     });
   }
 
-  async plantWateringReminder(): Promise<void> {
-    const subject = `⏰ Nhắc tưới cây: Cam`;
-    const text = `Đã đến lúc tưới cây Cam! Lịch hẹn: 8h`;
+  async sendPlantReminder(
+    mailData: MailData<{ plantName: string; schedule: string }>,
+  ): Promise<void> {
+    const i18n = I18nContext.current();
 
-    await this.notifier.notifyUserByEmail({
-      to: 'john.doe@example.com',
-      subject,
-      text,
+    let reminderTitle: MaybeType<string> = 'Nhắc nhở chăm sóc cây';
+    let appName: MaybeType<string> =
+      this.configService.get('app.name', { infer: true }) ?? 'App';
+    let actionTitle: MaybeType<string> = 'Mở ứng dụng';
+
+    if (i18n) {
+      [reminderTitle, appName, actionTitle] = await Promise.all([
+        i18n.t('reminder.plantCare'),
+        i18n.t('common.appName'),
+        i18n.t('common.openApp'),
+      ]);
+    }
+
+    await this.mailerService.sendMail({
+      to: mailData.to,
+      subject: reminderTitle,
+      text: `Đã đến lúc bạn cần chăm sóc cây: ${mailData.data.plantName}. Lịch: ${mailData.data.schedule}`,
       templatePath: path.join(
         this.configService.getOrThrow('app.workingDirectory', { infer: true }),
         'src',
         'mail',
         'mail-templates',
-        'plant-watering.hbs',
+        'plant-reminder.hbs',
       ),
       context: {
-        title: subject,
-        plantName: 'Cam',
-        schedule: '8h',
-        actionTitle: 'Tưới ngay',
-        app_name: this.configService.get('app.name', { infer: true }),
+        title: reminderTitle,
+        plantName: mailData.data.plantName,
+        schedule: mailData.data.schedule,
+        actionTitle,
+        app_name: appName,
       },
     });
   }
