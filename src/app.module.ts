@@ -31,6 +31,7 @@ import { ReminderOptionsModule } from './reminder-options/reminder-options.modul
 import { NotificationLogsModule } from './notification-logs/notification-logs.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { NotifierModule } from './notifier/notifier.module';
+import { PlantAnalysisModule } from './plant-analysis/plant-analysis.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -85,6 +86,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     MailModule,
     NotifierModule,
     HomeModule,
+    PlantAnalysisModule,
     TemplateSitesModule,
     SitesModule,
     SpeciesModule,

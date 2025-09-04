@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { WsModule } from '../websockets/ws.module';
 import { NotificationDispatcherService } from './notifier.service';
-import { NotificationDispatcherController } from './notifier.controller';
 import { ReminderOptionsModule } from '../reminder-options/reminder-options.module';
 import { PlantsModule } from '../plants/plants.module';
 import { UsersModule } from '../users/users.module';
@@ -9,6 +8,12 @@ import { NotificationLogsModule } from '../notification-logs/notification-logs.m
 import { NotificationsModule } from '../notifications/notifications.module';
 import { RedisPubSubService } from '../websockets/redis-pubsub.service';
 import { MailModule } from '../mail/mail.module';
+import { NotificationDispatcherController } from './notifier.controller';
+
+const controllers =
+  process.env.NODE_ENV === 'development'
+    ? [NotificationDispatcherController]
+    : [];
 
 @Module({
   imports: [
@@ -21,7 +26,7 @@ import { MailModule } from '../mail/mail.module';
     NotificationsModule,
   ],
   providers: [NotificationDispatcherService, RedisPubSubService],
-  controllers: [NotificationDispatcherController],
+  controllers,
   exports: [NotificationDispatcherService],
 })
 export class NotifierModule {}

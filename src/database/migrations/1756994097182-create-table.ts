@@ -1,14 +1,26 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateTable1756951471363 implements MigrationInterface {
-  name = 'CreateTable1756951471363';
+export class CreateTable1756994097182 implements MigrationInterface {
+  name = 'CreateTable1756994097182';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `CREATE TABLE "role" ("id" integer NOT NULL, "name" character varying NOT NULL, CONSTRAINT "PK_b36bcfe02fc8de3c57a8b2391c2" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "status" ("id" integer NOT NULL, "name" character varying NOT NULL, CONSTRAINT "PK_e12743a7086ec826733f54e1d95" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
-      `CREATE TABLE "status" ("id" integer NOT NULL, "name" character varying NOT NULL, CONSTRAINT "PK_e12743a7086ec826733f54e1d95" PRIMARY KEY ("id"))`,
+      `CREATE TYPE "public"."template_site_sunlight_enum" AS ENUM('full_sun', 'partial_sun', 'shade', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."template_site_lighttype_enum" AS ENUM('led', 'fluorescent', 'incandescent', 'natural', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."template_site_soiltype_enum" AS ENUM('sandy', 'clay', 'loamy', 'peaty', 'chalky', 'silty', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "template_site" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "description" character varying, "sunlight" "public"."template_site_sunlight_enum" NOT NULL DEFAULT 'unknown', "lightDuration" double precision, "lightType" "public"."template_site_lighttype_enum" DEFAULT 'unknown', "soilMoisture" double precision, "soilType" "public"."template_site_soiltype_enum" DEFAULT 'unknown', "phSoil" double precision, "temperature" double precision, "humidity" double precision, "windExposure" double precision, "latitude" double precision, "longitude" double precision, "altitude" double precision, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, CONSTRAINT "PK_e0caf3b6cfcb486ee79c48a98d1" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "role" ("id" integer NOT NULL, "name" character varying NOT NULL, CONSTRAINT "PK_b36bcfe02fc8de3c57a8b2391c2" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TABLE "file" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "path" character varying NOT NULL, CONSTRAINT "PK_36b46d232307066b3a2c9ea3a1d" PRIMARY KEY ("id"))`,
@@ -24,6 +36,12 @@ export class CreateTable1756951471363 implements MigrationInterface {
     );
     await queryRunner.query(
       `CREATE INDEX "IDX_f0e1b4ecdca13b177e2e3a0613" ON "user" ("lastName") `,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "session" ("id" SERIAL NOT NULL, "hash" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "userId" uuid, CONSTRAINT "PK_f55da76ac1c3ac420f444d2ff11" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_3d2f174ef04fb312fdebd0ddc5" ON "session" ("userId") `,
     );
     await queryRunner.query(
       `CREATE TYPE "public"."species_wateringmethod_enum" AS ENUM('root', 'spray', 'immersion', 'drip', 'wick', 'self_watering', 'overhead', 'other')`,
@@ -50,18 +68,6 @@ export class CreateTable1756951471363 implements MigrationInterface {
       `CREATE INDEX "IDX_72005e7b5fbd98db98353f74cb" ON "species" ("scientificName") `,
     );
     await queryRunner.query(
-      `CREATE TYPE "public"."template_site_sunlight_enum" AS ENUM('full_sun', 'partial_sun', 'shade', 'unknown')`,
-    );
-    await queryRunner.query(
-      `CREATE TYPE "public"."template_site_lighttype_enum" AS ENUM('led', 'fluorescent', 'incandescent', 'natural', 'unknown')`,
-    );
-    await queryRunner.query(
-      `CREATE TYPE "public"."template_site_soiltype_enum" AS ENUM('sandy', 'clay', 'loamy', 'peaty', 'chalky', 'silty', 'unknown')`,
-    );
-    await queryRunner.query(
-      `CREATE TABLE "template_site" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "description" character varying, "sunlight" "public"."template_site_sunlight_enum" NOT NULL DEFAULT 'unknown', "lightDuration" double precision, "lightType" "public"."template_site_lighttype_enum" DEFAULT 'unknown', "soilMoisture" double precision, "soilType" "public"."template_site_soiltype_enum" DEFAULT 'unknown', "phSoil" double precision, "temperature" double precision, "humidity" double precision, "windExposure" double precision, "latitude" double precision, "longitude" double precision, "altitude" double precision, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, CONSTRAINT "PK_e0caf3b6cfcb486ee79c48a98d1" PRIMARY KEY ("id"))`,
-    );
-    await queryRunner.query(
       `CREATE TYPE "public"."site_sunlight_enum" AS ENUM('full_sun', 'partial_sun', 'shade', 'unknown')`,
     );
     await queryRunner.query(
@@ -74,7 +80,7 @@ export class CreateTable1756951471363 implements MigrationInterface {
       `CREATE TABLE "site" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "description" character varying, "sunlight" "public"."site_sunlight_enum" DEFAULT 'unknown', "lightDuration" double precision, "lightType" "public"."site_lighttype_enum" DEFAULT 'unknown', "soilMoisture" double precision, "soilType" "public"."site_soiltype_enum" DEFAULT 'unknown', "phSoil" double precision, "temperature" double precision, "humidity" double precision, "windExposure" double precision, "latitude" double precision, "longitude" double precision, "altitude" double precision, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "userId" uuid, "templateId" uuid, CONSTRAINT "PK_635c0eeabda8862d5b0237b42b4" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
-      `CREATE TABLE "plant_image" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "plantId" uuid NOT NULL, "fileId" uuid NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, CONSTRAINT "PK_e3d2712c8418566a269e09c32b1" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "plant_image" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "plantId" uuid NOT NULL, "fileId" uuid NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, CONSTRAINT "REL_bf53a1e321b05ad5abf867358d" UNIQUE ("fileId"), CONSTRAINT "PK_e3d2712c8418566a269e09c32b1" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE INDEX "IDX_c4f4022812be0b878d48ca7542" ON "plant_image" ("plantId") `,
@@ -128,12 +134,6 @@ export class CreateTable1756951471363 implements MigrationInterface {
       `CREATE TABLE "reminder_options" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "isEnabled" boolean NOT NULL DEFAULT true, "sendMode" "public"."reminder_options_sendmode_enum" NOT NULL DEFAULT 'fixed_time', "startTime" TIME, "endTime" TIME, "priority" "public"."reminder_options_priority_enum" NOT NULL DEFAULT 'medium', "channels" text array NOT NULL DEFAULT ARRAY['email']::text[], "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "userId" uuid NOT NULL, CONSTRAINT "UQ_0c5717630c68d660cfe81557228" UNIQUE ("userId"), CONSTRAINT "PK_e2d392ccae864247c4a6444483a" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
-      `CREATE TABLE "session" ("id" SERIAL NOT NULL, "hash" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "userId" uuid, CONSTRAINT "PK_f55da76ac1c3ac420f444d2ff11" PRIMARY KEY ("id"))`,
-    );
-    await queryRunner.query(
-      `CREATE INDEX "IDX_3d2f174ef04fb312fdebd0ddc5" ON "session" ("userId") `,
-    );
-    await queryRunner.query(
       `CREATE TYPE "public"."notification_type_enum" AS ENUM('watering', 'fertilizing', 'reminder', 'general', 'other')`,
     );
     await queryRunner.query(
@@ -182,6 +182,9 @@ export class CreateTable1756951471363 implements MigrationInterface {
       `ALTER TABLE "user" ADD CONSTRAINT "FK_dc18daa696860586ba4667a9d31" FOREIGN KEY ("statusId") REFERENCES "status"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
     await queryRunner.query(
+      `ALTER TABLE "session" ADD CONSTRAINT "FK_3d2f174ef04fb312fdebd0ddc53" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
       `ALTER TABLE "species" ADD CONSTRAINT "FK_cc9d8d4fd9cab08f58b95cf6471" FOREIGN KEY ("imageId") REFERENCES "file"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
     await queryRunner.query(
@@ -207,9 +210,6 @@ export class CreateTable1756951471363 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE "water" ADD CONSTRAINT "FK_16792cc5f45502f4a1e6d3409eb" FOREIGN KEY ("plantId") REFERENCES "plant"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "session" ADD CONSTRAINT "FK_3d2f174ef04fb312fdebd0ddc53" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
     await queryRunner.query(
       `ALTER TABLE "notification" ADD CONSTRAINT "FK_1ced25315eb974b73391fb1c81b" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
@@ -251,9 +251,6 @@ export class CreateTable1756951471363 implements MigrationInterface {
       `ALTER TABLE "notification" DROP CONSTRAINT "FK_1ced25315eb974b73391fb1c81b"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "session" DROP CONSTRAINT "FK_3d2f174ef04fb312fdebd0ddc53"`,
-    );
-    await queryRunner.query(
       `ALTER TABLE "water" DROP CONSTRAINT "FK_16792cc5f45502f4a1e6d3409eb"`,
     );
     await queryRunner.query(
@@ -279,6 +276,9 @@ export class CreateTable1756951471363 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE "species" DROP CONSTRAINT "FK_cc9d8d4fd9cab08f58b95cf6471"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "session" DROP CONSTRAINT "FK_3d2f174ef04fb312fdebd0ddc53"`,
     );
     await queryRunner.query(
       `ALTER TABLE "user" DROP CONSTRAINT "FK_dc18daa696860586ba4667a9d31"`,
@@ -314,10 +314,6 @@ export class CreateTable1756951471363 implements MigrationInterface {
     );
     await queryRunner.query(`DROP TABLE "notification"`);
     await queryRunner.query(`DROP TYPE "public"."notification_type_enum"`);
-    await queryRunner.query(
-      `DROP INDEX "public"."IDX_3d2f174ef04fb312fdebd0ddc5"`,
-    );
-    await queryRunner.query(`DROP TABLE "session"`);
     await queryRunner.query(`DROP TABLE "reminder_options"`);
     await queryRunner.query(
       `DROP TYPE "public"."reminder_options_priority_enum"`,
@@ -356,12 +352,6 @@ export class CreateTable1756951471363 implements MigrationInterface {
     await queryRunner.query(`DROP TYPE "public"."site_soiltype_enum"`);
     await queryRunner.query(`DROP TYPE "public"."site_lighttype_enum"`);
     await queryRunner.query(`DROP TYPE "public"."site_sunlight_enum"`);
-    await queryRunner.query(`DROP TABLE "template_site"`);
-    await queryRunner.query(`DROP TYPE "public"."template_site_soiltype_enum"`);
-    await queryRunner.query(
-      `DROP TYPE "public"."template_site_lighttype_enum"`,
-    );
-    await queryRunner.query(`DROP TYPE "public"."template_site_sunlight_enum"`);
     await queryRunner.query(
       `DROP INDEX "public"."IDX_72005e7b5fbd98db98353f74cb"`,
     );
@@ -379,6 +369,10 @@ export class CreateTable1756951471363 implements MigrationInterface {
     );
     await queryRunner.query(`DROP TYPE "public"."species_wateringmethod_enum"`);
     await queryRunner.query(
+      `DROP INDEX "public"."IDX_3d2f174ef04fb312fdebd0ddc5"`,
+    );
+    await queryRunner.query(`DROP TABLE "session"`);
+    await queryRunner.query(
       `DROP INDEX "public"."IDX_f0e1b4ecdca13b177e2e3a0613"`,
     );
     await queryRunner.query(
@@ -389,7 +383,13 @@ export class CreateTable1756951471363 implements MigrationInterface {
     );
     await queryRunner.query(`DROP TABLE "user"`);
     await queryRunner.query(`DROP TABLE "file"`);
-    await queryRunner.query(`DROP TABLE "status"`);
     await queryRunner.query(`DROP TABLE "role"`);
+    await queryRunner.query(`DROP TABLE "template_site"`);
+    await queryRunner.query(`DROP TYPE "public"."template_site_soiltype_enum"`);
+    await queryRunner.query(
+      `DROP TYPE "public"."template_site_lighttype_enum"`,
+    );
+    await queryRunner.query(`DROP TYPE "public"."template_site_sunlight_enum"`);
+    await queryRunner.query(`DROP TABLE "status"`);
   }
 }

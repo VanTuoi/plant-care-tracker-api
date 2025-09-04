@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class PlantResponseDto {
+export class PlantAnalysisResponseDto {
   @ApiProperty()
   name: string;
 

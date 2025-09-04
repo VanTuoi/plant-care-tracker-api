@@ -6,6 +6,8 @@ import {
   DeleteDateColumn,
   Index,
   ManyToOne,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 import { PlantEntity } from '../../../../../plants/infrastructure/persistence/relational/entities/plants.entity';
@@ -26,8 +28,9 @@ export class PlantImageEntity extends EntityRelationalHelper {
   @Column('uuid')
   fileId: string;
 
-  @ManyToOne(() => FileEntity, { eager: true })
-  file: FileEntity;
+  @OneToOne(() => FileEntity, { eager: true, nullable: true })
+  @JoinColumn({ name: 'fileId' })
+  file?: FileEntity;
 
   @CreateDateColumn()
   createdAt: Date;

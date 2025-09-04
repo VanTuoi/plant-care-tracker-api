@@ -1,16 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Plant } from '../../domain/plant';
+import { PlantAnalysis } from '../../domain/plant-analysis';
 import axios from 'axios';
 import FormData from 'form-data';
 
 @Injectable()
-export class PlantAiApi {
-  private readonly apiKey = process.env.PLANT_AI_API;
+export class PlantAnalysisApi {
+  private readonly apiKey = process.env.PLANT_ANALYSIS_API_KEY;
   private readonly baseUrl = 'https://my-api.plantnet.org/v2/identify/all';
   private readonly includeImage = 'true';
   private readonly allowedMimeTypes = ['image/jpeg', 'image/png'];
 
-  async identify(file: Express.Multer.File): Promise<Plant[]> {
+  async identify(file: Express.Multer.File): Promise<PlantAnalysis[]> {
+    if (!this.apiKey) throw new BadRequestException('No api key');
     if (!file) throw new BadRequestException('No file provided');
 
     if (!this.allowedMimeTypes.includes(file.mimetype)) {
@@ -28,21 +29,22 @@ export class PlantAiApi {
       const response = await axios.post(
         `${this.baseUrl}?include-related-images=${this.includeImage}&api-key=${this.apiKey}`,
         form,
-        {
-          headers: {
-            ...form.getHeaders(),
-          },
-        },
+        { headers: { ...form.getHeaders() } },
       );
 
       const data = response.data;
 
-      const plants: Plant[] = (data.results || []).map((r: any) => {
+      if (!data.results || data.results.length === 0) {
+        return [];
+      }
+
+      const plants: PlantAnalysis[] = data.results.map((r: any) => {
         const name = r.species?.scientificNameWithoutAuthor || 'Unknown';
-        const probability = r.score || 0;
+        const scientificName = r.species?.scientificName || name;
+        const probability = Math.round((r.score || 0) * 100);
         const imageUrl = r.images?.[0]?.url || null;
 
-        return new Plant(name, probability, imageUrl);
+        return new PlantAnalysis(name, probability, imageUrl, scientificName);
       });
 
       return plants;
