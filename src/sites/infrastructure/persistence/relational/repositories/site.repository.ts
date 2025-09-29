@@ -9,6 +9,7 @@ import { Site } from '../../../../domain/site';
 import { FilterSiteDto, SortSiteDto } from '../../../../dto/query-site.dto';
 import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
 import { NullableType } from '../../../../../utils/types/nullable.type';
+import { PlantEntity } from '../../../../../plants/infrastructure/persistence/relational/entities/plants.entity';
 
 @Injectable()
 export class SitesRelationalRepository implements SiteRepository {
@@ -97,6 +98,10 @@ export class SitesRelationalRepository implements SiteRepository {
   }
 
   async remove(id: Site['id']): Promise<void> {
-    await this.sitesRepository.delete(id);
+    await this.sitesRepository.manager
+      .getRepository(PlantEntity)
+      .softDelete({ site: { id } });
+
+    await this.sitesRepository.softDelete(id);
   }
 }

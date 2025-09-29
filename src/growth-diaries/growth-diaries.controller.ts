@@ -8,7 +8,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { GrowthDiariesService } from './growth-diaries.service';
 import { CreateGrowthDiaryDto } from './dto/create-growth-diary.dto';
 import { GrowthDiary } from './domain/growth-diary';
@@ -28,7 +33,10 @@ export class GrowthDiariesController {
   constructor(private readonly growthDiaryService: GrowthDiariesService) {}
 
   @Post()
-  @ApiCreatedResponse({ description: 'Tạo ghi chép thành công' })
+  @ApiCreatedResponse({
+    description: 'Tạo ghi chép thành công',
+    type: GrowthDiary,
+  })
   async create(
     @Body() dto: CreateGrowthDiaryDto,
     @Req() req,
@@ -40,18 +48,27 @@ export class GrowthDiariesController {
   }
 
   @Get()
-  @ApiCreatedResponse({ description: 'Lấy tất cả ghi chép' })
+  @ApiOkResponse({
+    description: 'Lấy tất cả ghi chép',
+    type: [GrowthDiary],
+  })
   async getAll(): Promise<GrowthDiary[]> {
     return this.growthDiaryService.getAll();
   }
 
   @Get(':id')
-  @ApiCreatedResponse({ description: 'Lấy ghi chép theo ID' })
+  @ApiOkResponse({
+    description: 'Lấy ghi chép theo ID',
+    type: GrowthDiary,
+  })
   async getById(@Param() dto: GrowthDiaryIdDto): Promise<GrowthDiary | null> {
     return this.growthDiaryService.getById(dto.id);
   }
 
   @Delete(':id')
+  @ApiOkResponse({
+    description: 'Xoá ghi chép thành công',
+  })
   async deleteById(@Param() dto: GrowthDiaryIdDto) {
     return this.growthDiaryService.deleteById(dto.id);
   }

@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsNumber,
   IsEnum,
+  ValidateNested,
 } from 'class-validator';
 import { WaterEnum } from '../../waters/waters.enum';
 import {
@@ -19,6 +20,7 @@ import {
 import { Type } from 'class-transformer';
 import { PlantSizeEnum } from '../plant.enum';
 import { PlantImage } from '../../plant-image/domain/plant-image';
+import { Site } from '../../sites/domain/site';
 
 export class Plant {
   @ApiProperty({
@@ -181,10 +183,11 @@ export class Plant {
   userId?: string;
 
   @ApiPropertyOptional({
-    description: 'ID khu vực (site)',
-    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    description: 'Khu vực (site)',
+    type: () => Site,
   })
-  @IsString()
   @IsOptional()
-  siteId?: string;
+  @ValidateNested()
+  @Type(() => Site)
+  site?: Site;
 }

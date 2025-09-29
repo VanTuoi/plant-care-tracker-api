@@ -29,7 +29,7 @@ export class PlantMapper {
 
     domainEntity.speciesId = raw.species?.id;
     domainEntity.userId = raw.user?.id;
-    domainEntity.siteId = raw.site?.id;
+    domainEntity.site = raw.site;
 
     domainEntity.images = raw.images?.map(PlantImageMapper.toDomain);
 
@@ -73,9 +73,9 @@ export class PlantMapper {
       persistenceEntity.user = userEntity;
     }
 
-    if (domainEntity.siteId) {
+    if (domainEntity.site) {
       const siteEntity = new SiteEntity();
-      siteEntity.id = domainEntity.siteId;
+      siteEntity.id = domainEntity.site.id;
       persistenceEntity.site = siteEntity;
     }
 

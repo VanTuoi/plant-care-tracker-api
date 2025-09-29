@@ -16,6 +16,6 @@ export abstract class GrowthDiaryRepository {
   abstract deleteById(id: GrowthDiary['id']): Promise<void>;
 
   abstract findByFileId(
-    fileId: GrowthDiary['fileId'],
+    fileId: NonNullable<GrowthDiary['file']>['id'],
   ): Promise<GrowthDiary | null>;
 }
