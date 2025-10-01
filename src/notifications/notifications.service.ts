@@ -78,6 +78,14 @@ export class NotificationsService {
     return this.notificationsRepository.create(notificationData);
   }
 
+  async findAll(jwt: JwtPayloadType): Promise<Notification[]> {
+    if (jwt.role?.id === RoleEnum.admin) {
+      return this.notificationsRepository.findAll();
+    }
+
+    return await this.notificationsRepository.findByUserId(jwt.id);
+  }
+
   async findById(
     id: Notification['id'],
     jwt: JwtPayloadType,

@@ -12,6 +12,7 @@ import { FertilizerRepository } from './infrastructure/persistence/fertilizers.r
 import { JwtPayloadType } from '../common/types/jwt-payload.type';
 import { RoleEnum } from '../roles/roles.enum';
 import { PlantRepository } from '../plants/infrastructure/persistence/plants.repository';
+import { Plant } from '../plants/domain/plant';
 
 @Injectable()
 export class FertilizersService {
@@ -38,8 +39,16 @@ export class FertilizersService {
         errors: { user: 'cannotCreateFertilizerForPlantOfAnotherUser' },
       });
     }
+    const fertilizer = new Fertilizer();
+    fertilizer.note = dto.note;
+    fertilizer.amount = dto.amount;
+    fertilizer.method = dto.method;
+    fertilizer.fertilizerType = dto.fertilizerType;
+    fertilizer.status = dto.status;
 
-    return this.fertilizerRepository.create(dto);
+    fertilizer.plant = { id: dto.plantId } as Plant;
+
+    return this.fertilizerRepository.create(fertilizer);
   }
 
   async findAll(jwt: JwtPayloadType): Promise<Fertilizer[]> {
@@ -58,14 +67,14 @@ export class FertilizersService {
     jwt: JwtPayloadType,
   ): Promise<NullableType<Fertilizer>> {
     const fertilizer = await this.fertilizerRepository.findById(id);
-    if (!fertilizer) {
+    if (!fertilizer || !fertilizer.plant?.id) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: { fertilizer: 'fertilizerNotExists' },
       });
     }
 
-    const plant = await this.plantRepository.findById(fertilizer.plantId);
+    const plant = await this.plantRepository.findById(fertilizer.plant?.id);
     if (!plant)
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -88,14 +97,14 @@ export class FertilizersService {
     jwt: JwtPayloadType,
   ): Promise<Fertilizer | null> {
     const fertilizer = await this.fertilizerRepository.findById(id);
-    if (!fertilizer) {
+    if (!fertilizer || !fertilizer.plant?.id) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: { fertilizer: 'fertilizerNotExists' },
       });
     }
 
-    const plant = await this.plantRepository.findById(fertilizer.plantId);
+    const plant = await this.plantRepository.findById(fertilizer.plant?.id);
     if (!plant)
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,

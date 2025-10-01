@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateTable1759130076824 implements MigrationInterface {
-  name = 'CreateTable1759130076824';
+export class CreateTable1759238580037 implements MigrationInterface {
+  name = 'CreateTable1759238580037';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -116,7 +116,10 @@ export class CreateTable1759130076824 implements MigrationInterface {
       `CREATE TYPE "public"."water_method_enum" AS ENUM('root', 'spray', 'immersion', 'drip', 'wick', 'self_watering', 'overhead', 'other')`,
     );
     await queryRunner.query(
-      `CREATE TABLE "water" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "note" text, "amount" integer NOT NULL, "method" "public"."water_method_enum" NOT NULL, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "plantId" uuid, CONSTRAINT "PK_8fe16d29fb45be6c0de0b2ed6a3" PRIMARY KEY ("id"))`,
+      `CREATE TYPE "public"."water_status_enum" AS ENUM('scheduled', 'done', 'missed')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "water" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "note" text, "amount" integer NOT NULL, "method" "public"."water_method_enum" NOT NULL, "status" "public"."water_status_enum" NOT NULL DEFAULT 'scheduled', "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "plantId" uuid, CONSTRAINT "PK_8fe16d29fb45be6c0de0b2ed6a3" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TABLE "session" ("id" SERIAL NOT NULL, "hash" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "userId" uuid, CONSTRAINT "PK_f55da76ac1c3ac420f444d2ff11" PRIMARY KEY ("id"))`,
@@ -170,7 +173,10 @@ export class CreateTable1759130076824 implements MigrationInterface {
       `CREATE TYPE "public"."fertilizer_method_enum" AS ENUM('soil_mixing', 'surface_spread', 'liquid_feed', 'foliar_feed', 'other')`,
     );
     await queryRunner.query(
-      `CREATE TABLE "fertilizer" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "note" text, "fertilizerType" "public"."fertilizer_fertilizertype_enum" NOT NULL, "amount" integer NOT NULL, "method" "public"."fertilizer_method_enum" NOT NULL, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "plantId" uuid, CONSTRAINT "PK_3d0704e83bef3b07de441b2f47a" PRIMARY KEY ("id"))`,
+      `CREATE TYPE "public"."fertilizer_status_enum" AS ENUM('scheduled', 'done', 'missed')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "fertilizer" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "note" text, "fertilizerType" "public"."fertilizer_fertilizertype_enum" NOT NULL, "amount" integer NOT NULL, "method" "public"."fertilizer_method_enum" NOT NULL, "status" "public"."fertilizer_status_enum" NOT NULL DEFAULT 'scheduled', "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "plantId" uuid, CONSTRAINT "PK_3d0704e83bef3b07de441b2f47a" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `ALTER TABLE "user" ADD CONSTRAINT "FK_75e2be4ce11d447ef43be0e374f" FOREIGN KEY ("photoId") REFERENCES "file"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
@@ -290,6 +296,7 @@ export class CreateTable1759130076824 implements MigrationInterface {
       `ALTER TABLE "user" DROP CONSTRAINT "FK_75e2be4ce11d447ef43be0e374f"`,
     );
     await queryRunner.query(`DROP TABLE "fertilizer"`);
+    await queryRunner.query(`DROP TYPE "public"."fertilizer_status_enum"`);
     await queryRunner.query(`DROP TYPE "public"."fertilizer_method_enum"`);
     await queryRunner.query(
       `DROP TYPE "public"."fertilizer_fertilizertype_enum"`,
@@ -326,6 +333,7 @@ export class CreateTable1759130076824 implements MigrationInterface {
     );
     await queryRunner.query(`DROP TABLE "session"`);
     await queryRunner.query(`DROP TABLE "water"`);
+    await queryRunner.query(`DROP TYPE "public"."water_status_enum"`);
     await queryRunner.query(`DROP TYPE "public"."water_method_enum"`);
     await queryRunner.query(
       `DROP INDEX "public"."IDX_bec0f76ffa76998edd7d297aa8"`,

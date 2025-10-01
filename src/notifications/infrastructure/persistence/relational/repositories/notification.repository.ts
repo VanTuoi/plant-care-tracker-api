@@ -25,6 +25,13 @@ export class NotificationsRelationalRepository
     return NotificationMapper.toDomain(newEntity);
   }
 
+  async findAll(): Promise<Notification[]> {
+    const entities = await this.notificationsRepository.find();
+    return entities.map((notification) =>
+      NotificationMapper.toDomain(notification),
+    );
+  }
+
   async findById(id: Notification['id']): Promise<NullableType<Notification>> {
     const entity = await this.notificationsRepository.findOne({
       where: { id },

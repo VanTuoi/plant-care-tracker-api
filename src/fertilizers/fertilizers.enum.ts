@@ -21,3 +21,9 @@ export enum FertilizerTypeEnum {
   MICRO_NUTRIENT = 'micro_nutrient',
   OTHER = 'other',
 }
+
+export enum FertilizerStatusEnum {
+  SCHEDULED = 'scheduled',
+  DONE = 'done',
+  MISSED = 'missed',
+}

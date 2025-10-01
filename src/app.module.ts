@@ -32,6 +32,7 @@ import { NotificationLogsModule } from './notification-logs/notification-logs.mo
 import { NotificationsModule } from './notifications/notifications.module';
 import { NotifierModule } from './notifier/notifier.module';
 import { PlantAnalysisModule } from './plant-analysis/plant-analysis.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -78,6 +79,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
     }),
+    ScheduleModule.forRoot(),
     UsersModule,
     AuthModule,
     AuthGoogleModule,

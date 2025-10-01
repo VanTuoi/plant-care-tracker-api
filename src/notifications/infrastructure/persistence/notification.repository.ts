@@ -7,6 +7,8 @@ export abstract class NotificationRepository {
     data: Omit<Notification, 'id' | 'createdAt' | 'updatedAt'>,
   ): Promise<Notification>;
 
+  abstract findAll(): Promise<Notification[]>;
+
   abstract findById(
     id: Notification['id'],
   ): Promise<NullableType<Notification>>;

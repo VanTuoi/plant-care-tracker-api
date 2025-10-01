@@ -8,3 +8,9 @@ export enum WaterEnum {
   OVERHEAD = 'overhead',
   OTHER = 'other',
 }
+
+export enum WaterStatusEnum {
+  SCHEDULED = 'scheduled',
+  DONE = 'done',
+  MISSED = 'missed',
+}

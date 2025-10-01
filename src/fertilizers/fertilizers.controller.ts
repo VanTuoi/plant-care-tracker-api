@@ -1,4 +1,3 @@
-// fertilizers.controller.ts
 import {
   Controller,
   Get,
