@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { FilesModule } from './files/files.module';
-import { PlantModule } from './notification/notification.module';
 import { AuthModule } from './auth/auth.module';
 import databaseConfig from './database/config/database.config';
 import authConfig from './auth/config/auth.config';
@@ -20,7 +19,20 @@ import { HomeModule } from './home/home.module';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
-import { MailerModule } from './mailer/mailer.module';
+import { SitesModule } from './sites/sites.module';
+import { SpeciesModule } from './species/species.module';
+import { WatersModule } from './waters/waters.module';
+import { FertilizersModule } from './fertilizers/fertilizers.module';
+import { PlantsModule } from './plants/plants.module';
+import { TemplateSitesModule } from './template-sites/template-sites.module';
+import { PlantImageModule } from './plant-image/plant-image.module';
+import { GrowthDiaryModule } from './growth-diaries/growth-diaries.module';
+import { ReminderOptionsModule } from './reminder-options/reminder-options.module';
+import { NotificationLogsModule } from './notification-logs/notification-logs.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { NotifierModule } from './notifier/notifier.module';
+import { PlantAnalysisModule } from './plant-analysis/plant-analysis.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -67,15 +79,27 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
     }),
+    ScheduleModule.forRoot(),
     UsersModule,
-    FilesModule,
-    PlantModule,
     AuthModule,
     AuthGoogleModule,
     SessionModule,
+    FilesModule,
     MailModule,
-    MailerModule,
+    NotifierModule,
     HomeModule,
+    PlantAnalysisModule,
+    TemplateSitesModule,
+    SitesModule,
+    SpeciesModule,
+    PlantsModule,
+    PlantImageModule,
+    GrowthDiaryModule,
+    WatersModule,
+    FertilizersModule,
+    ReminderOptionsModule,
+    NotificationsModule,
+    NotificationLogsModule,
   ],
 })
 export class AppModule {}

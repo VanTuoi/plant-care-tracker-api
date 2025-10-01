@@ -1,0 +1,403 @@
+import { MigrationInterface, QueryRunner } from 'typeorm';
+
+export class CreateTable1759238580037 implements MigrationInterface {
+  name = 'CreateTable1759238580037';
+
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `CREATE TABLE "role" ("id" integer NOT NULL, "name" character varying NOT NULL, CONSTRAINT "PK_b36bcfe02fc8de3c57a8b2391c2" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "status" ("id" integer NOT NULL, "name" character varying NOT NULL, CONSTRAINT "PK_e12743a7086ec826733f54e1d95" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "file" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "path" character varying NOT NULL, CONSTRAINT "PK_36b46d232307066b3a2c9ea3a1d" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "user" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "email" character varying, "password" character varying, "provider" character varying NOT NULL DEFAULT 'email', "socialId" character varying, "firstName" character varying, "lastName" character varying, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "photoId" uuid, "roleId" integer, "statusId" integer, CONSTRAINT "UQ_e12875dfb3b1d92d7d7c5377e22" UNIQUE ("email"), CONSTRAINT "REL_75e2be4ce11d447ef43be0e374" UNIQUE ("photoId"), CONSTRAINT "PK_cace4a159ff9f2512dd42373760" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_9bd2fe7a8e694dedc4ec2f666f" ON "user" ("socialId") `,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_58e4dbff0e1a32a9bdc861bb29" ON "user" ("firstName") `,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_f0e1b4ecdca13b177e2e3a0613" ON "user" ("lastName") `,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."species_wateringmethod_enum" AS ENUM('root', 'spray', 'immersion', 'drip', 'wick', 'self_watering', 'overhead', 'other')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."species_fertilizingmethod_enum" AS ENUM('soil_mixing', 'surface_spread', 'liquid_feed', 'foliar_feed', 'other')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."species_fertilizertype_enum" AS ENUM('organic', 'inorganic', 'npk', 'urea', 'ammonium_sulfate', 'liquid', 'compost', 'manure', 'bonemeal', 'bloodmeal', 'green_manure', 'micro_nutrient', 'other')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."species_sunlightneed_enum" AS ENUM('full_sun', 'partial_sun', 'shade', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."species_difficultylevel_enum" AS ENUM('easy', 'moderate', 'hard')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "species" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "scientificName" character varying NOT NULL, "wateringFrequency" integer, "wateringAmount" integer, "wateringMethod" "public"."species_wateringmethod_enum", "fertilizingFrequency" integer, "fertilizingAmount" integer, "fertilizingMethod" "public"."species_fertilizingmethod_enum", "fertilizerType" "public"."species_fertilizertype_enum", "sunlightNeed" "public"."species_sunlightneed_enum", "difficultyLevel" "public"."species_difficultylevel_enum", "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP WITH TIME ZONE, "imageId" uuid, CONSTRAINT "PK_ae6a87f2423ba6c25dc43c32770" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_1adf701cac3b2c0f8bacb54774" ON "species" ("name") `,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_72005e7b5fbd98db98353f74cb" ON "species" ("scientificName") `,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."template_site_sunlight_enum" AS ENUM('full_sun', 'partial_sun', 'shade', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."template_site_lighttype_enum" AS ENUM('led', 'fluorescent', 'incandescent', 'natural', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."template_site_soiltype_enum" AS ENUM('sandy', 'clay', 'loamy', 'peaty', 'chalky', 'silty', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "template_site" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "description" character varying, "sunlight" "public"."template_site_sunlight_enum" NOT NULL DEFAULT 'unknown', "lightDuration" double precision, "lightType" "public"."template_site_lighttype_enum" DEFAULT 'unknown', "soilMoisture" double precision, "soilType" "public"."template_site_soiltype_enum" DEFAULT 'unknown', "phSoil" double precision, "temperature" double precision, "humidity" double precision, "windExposure" double precision, "latitude" double precision, "longitude" double precision, "altitude" double precision, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, CONSTRAINT "PK_e0caf3b6cfcb486ee79c48a98d1" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."site_sunlight_enum" AS ENUM('full_sun', 'partial_sun', 'shade', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."site_lighttype_enum" AS ENUM('led', 'fluorescent', 'incandescent', 'natural', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."site_soiltype_enum" AS ENUM('sandy', 'clay', 'loamy', 'peaty', 'chalky', 'silty', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "site" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "description" character varying, "sunlight" "public"."site_sunlight_enum" DEFAULT 'unknown', "lightDuration" double precision, "lightType" "public"."site_lighttype_enum" DEFAULT 'unknown', "soilMoisture" double precision, "soilType" "public"."site_soiltype_enum" DEFAULT 'unknown', "phSoil" double precision, "temperature" double precision, "humidity" double precision, "windExposure" double precision, "latitude" double precision, "longitude" double precision, "altitude" double precision, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "userId" uuid, "templateId" uuid, CONSTRAINT "PK_635c0eeabda8862d5b0237b42b4" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "plant_image" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "plantId" uuid NOT NULL, "fileId" uuid NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, CONSTRAINT "REL_bf53a1e321b05ad5abf867358d" UNIQUE ("fileId"), CONSTRAINT "PK_e3d2712c8418566a269e09c32b1" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_c4f4022812be0b878d48ca7542" ON "plant_image" ("plantId") `,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."plant_size_enum" AS ENUM('tiny', 'small', 'medium', 'large', 'huge')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."plant_wateringmethod_enum" AS ENUM('root', 'spray', 'immersion', 'drip', 'wick', 'self_watering', 'overhead', 'other')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."plant_fertilizingmethod_enum" AS ENUM('soil_mixing', 'surface_spread', 'liquid_feed', 'foliar_feed', 'other')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."plant_fertilizertype_enum" AS ENUM('organic', 'inorganic', 'npk', 'urea', 'ammonium_sulfate', 'liquid', 'compost', 'manure', 'bonemeal', 'bloodmeal', 'green_manure', 'micro_nutrient', 'other')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."plant_sunlightneed_enum" AS ENUM('full_sun', 'partial_sun', 'shade', 'unknown')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."plant_difficultylevel_enum" AS ENUM('easy', 'moderate', 'hard')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "plant" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying, "scientificName" character varying, "size" "public"."plant_size_enum", "inGround" boolean NOT NULL DEFAULT true, "isDead" boolean NOT NULL DEFAULT false, "wateringFrequency" integer, "wateringAmount" integer, "wateringMethod" "public"."plant_wateringmethod_enum", "fertilizingFrequency" integer, "fertilizingAmount" integer, "fertilizingMethod" "public"."plant_fertilizingmethod_enum", "fertilizerType" "public"."plant_fertilizertype_enum", "sunlightNeed" "public"."plant_sunlightneed_enum", "difficultyLevel" "public"."plant_difficultylevel_enum", "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "speciesId" uuid, "userId" uuid, "siteId" uuid, CONSTRAINT "PK_97e1eb0d045aadea59401ece5ba" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_06daeb1e9d8c4b6ac7e6bd854e" ON "plant" ("name") `,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_7778484944052d972e129fea87" ON "plant" ("speciesId") `,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_ab082df81848f48f1d1f64a9cf" ON "plant" ("userId") `,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_bec0f76ffa76998edd7d297aa8" ON "plant" ("siteId") `,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."water_method_enum" AS ENUM('root', 'spray', 'immersion', 'drip', 'wick', 'self_watering', 'overhead', 'other')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."water_status_enum" AS ENUM('scheduled', 'done', 'missed')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "water" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "note" text, "amount" integer NOT NULL, "method" "public"."water_method_enum" NOT NULL, "status" "public"."water_status_enum" NOT NULL DEFAULT 'scheduled', "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "plantId" uuid, CONSTRAINT "PK_8fe16d29fb45be6c0de0b2ed6a3" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "session" ("id" SERIAL NOT NULL, "hash" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, "userId" uuid, CONSTRAINT "PK_f55da76ac1c3ac420f444d2ff11" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_3d2f174ef04fb312fdebd0ddc5" ON "session" ("userId") `,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."reminder_options_sendmode_enum" AS ENUM('fixed_time', 'anytime')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."reminder_options_priority_enum" AS ENUM('low', 'medium', 'high')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "reminder_options" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "isEnabled" boolean NOT NULL DEFAULT true, "sendMode" "public"."reminder_options_sendmode_enum" NOT NULL DEFAULT 'fixed_time', "startTime" TIME, "endTime" TIME, "priority" "public"."reminder_options_priority_enum" NOT NULL DEFAULT 'medium', "channels" text array NOT NULL DEFAULT ARRAY['email']::text[], "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "userId" uuid NOT NULL, CONSTRAINT "UQ_0c5717630c68d660cfe81557228" UNIQUE ("userId"), CONSTRAINT "PK_e2d392ccae864247c4a6444483a" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."notification_type_enum" AS ENUM('watering', 'fertilizing', 'reminder', 'general', 'other')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "notification" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "title" character varying, "type" "public"."notification_type_enum", "payload" text, "url" character varying, "isRead" boolean NOT NULL DEFAULT false, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "userId" uuid, "plantId" uuid, CONSTRAINT "PK_705b6c7cdf9b2c2ff7ac7872cb7" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_1ced25315eb974b73391fb1c81" ON "notification" ("userId") `,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_d7c44e2587f4292047c895ecb5" ON "notification" ("plantId") `,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."notification_logs_status_enum" AS ENUM('sent', 'failed')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."notification_logs_channel_enum" AS ENUM('email', 'sms', 'socket')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "notification_logs" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "status" "public"."notification_logs_status_enum" NOT NULL DEFAULT 'sent', "channel" "public"."notification_logs_channel_enum" NOT NULL DEFAULT 'email', "errorMessage" text, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "notificationId" uuid NOT NULL, CONSTRAINT "PK_19c524e644cdeaebfcffc284871" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."growth_diary_mood_enum" AS ENUM('happy', 'sad', 'neutral', 'angry', 'other')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "growth_diary" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "plantId" uuid NOT NULL, "fileId" uuid, "note" text, "mood" "public"."growth_diary_mood_enum", "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, CONSTRAINT "REL_e3fb2de2c8eb486e26b28061b5" UNIQUE ("fileId"), CONSTRAINT "PK_3df2ded1759fdf943517a130411" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_46fd269e18704c161dfeecd60f" ON "growth_diary" ("plantId") `,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."fertilizer_fertilizertype_enum" AS ENUM('organic', 'inorganic', 'npk', 'urea', 'ammonium_sulfate', 'liquid', 'compost', 'manure', 'bonemeal', 'bloodmeal', 'green_manure', 'micro_nutrient', 'other')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."fertilizer_method_enum" AS ENUM('soil_mixing', 'surface_spread', 'liquid_feed', 'foliar_feed', 'other')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."fertilizer_status_enum" AS ENUM('scheduled', 'done', 'missed')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "fertilizer" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "note" text, "fertilizerType" "public"."fertilizer_fertilizertype_enum" NOT NULL, "amount" integer NOT NULL, "method" "public"."fertilizer_method_enum" NOT NULL, "status" "public"."fertilizer_status_enum" NOT NULL DEFAULT 'scheduled', "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "plantId" uuid, CONSTRAINT "PK_3d0704e83bef3b07de441b2f47a" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "user" ADD CONSTRAINT "FK_75e2be4ce11d447ef43be0e374f" FOREIGN KEY ("photoId") REFERENCES "file"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "user" ADD CONSTRAINT "FK_c28e52f758e7bbc53828db92194" FOREIGN KEY ("roleId") REFERENCES "role"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "user" ADD CONSTRAINT "FK_dc18daa696860586ba4667a9d31" FOREIGN KEY ("statusId") REFERENCES "status"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "species" ADD CONSTRAINT "FK_cc9d8d4fd9cab08f58b95cf6471" FOREIGN KEY ("imageId") REFERENCES "file"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "site" ADD CONSTRAINT "FK_e03827c061fbf85fd3aae454aec" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "site" ADD CONSTRAINT "FK_791bdfe69779af31d88b1996d28" FOREIGN KEY ("templateId") REFERENCES "template_site"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "plant_image" ADD CONSTRAINT "FK_c4f4022812be0b878d48ca75420" FOREIGN KEY ("plantId") REFERENCES "plant"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "plant_image" ADD CONSTRAINT "FK_bf53a1e321b05ad5abf867358df" FOREIGN KEY ("fileId") REFERENCES "file"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "plant" ADD CONSTRAINT "FK_7778484944052d972e129fea871" FOREIGN KEY ("speciesId") REFERENCES "species"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "plant" ADD CONSTRAINT "FK_ab082df81848f48f1d1f64a9cf8" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "plant" ADD CONSTRAINT "FK_bec0f76ffa76998edd7d297aa8f" FOREIGN KEY ("siteId") REFERENCES "site"("id") ON DELETE CASCADE ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "water" ADD CONSTRAINT "FK_16792cc5f45502f4a1e6d3409eb" FOREIGN KEY ("plantId") REFERENCES "plant"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "session" ADD CONSTRAINT "FK_3d2f174ef04fb312fdebd0ddc53" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "notification" ADD CONSTRAINT "FK_1ced25315eb974b73391fb1c81b" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "notification" ADD CONSTRAINT "FK_d7c44e2587f4292047c895ecb5f" FOREIGN KEY ("plantId") REFERENCES "plant"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "notification_logs" ADD CONSTRAINT "FK_a1a20a54a95033fa92853a4269d" FOREIGN KEY ("notificationId") REFERENCES "notification"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "growth_diary" ADD CONSTRAINT "FK_46fd269e18704c161dfeecd60f6" FOREIGN KEY ("plantId") REFERENCES "plant"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "growth_diary" ADD CONSTRAINT "FK_e3fb2de2c8eb486e26b28061b5c" FOREIGN KEY ("fileId") REFERENCES "file"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "fertilizer" ADD CONSTRAINT "FK_d9585ff33f254a4c346aed2dace" FOREIGN KEY ("plantId") REFERENCES "plant"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+    );
+  }
+
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `ALTER TABLE "fertilizer" DROP CONSTRAINT "FK_d9585ff33f254a4c346aed2dace"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "growth_diary" DROP CONSTRAINT "FK_e3fb2de2c8eb486e26b28061b5c"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "growth_diary" DROP CONSTRAINT "FK_46fd269e18704c161dfeecd60f6"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "notification_logs" DROP CONSTRAINT "FK_a1a20a54a95033fa92853a4269d"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "notification" DROP CONSTRAINT "FK_d7c44e2587f4292047c895ecb5f"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "notification" DROP CONSTRAINT "FK_1ced25315eb974b73391fb1c81b"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "session" DROP CONSTRAINT "FK_3d2f174ef04fb312fdebd0ddc53"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "water" DROP CONSTRAINT "FK_16792cc5f45502f4a1e6d3409eb"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "plant" DROP CONSTRAINT "FK_bec0f76ffa76998edd7d297aa8f"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "plant" DROP CONSTRAINT "FK_ab082df81848f48f1d1f64a9cf8"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "plant" DROP CONSTRAINT "FK_7778484944052d972e129fea871"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "plant_image" DROP CONSTRAINT "FK_bf53a1e321b05ad5abf867358df"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "plant_image" DROP CONSTRAINT "FK_c4f4022812be0b878d48ca75420"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "site" DROP CONSTRAINT "FK_791bdfe69779af31d88b1996d28"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "site" DROP CONSTRAINT "FK_e03827c061fbf85fd3aae454aec"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "species" DROP CONSTRAINT "FK_cc9d8d4fd9cab08f58b95cf6471"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "user" DROP CONSTRAINT "FK_dc18daa696860586ba4667a9d31"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "user" DROP CONSTRAINT "FK_c28e52f758e7bbc53828db92194"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "user" DROP CONSTRAINT "FK_75e2be4ce11d447ef43be0e374f"`,
+    );
+    await queryRunner.query(`DROP TABLE "fertilizer"`);
+    await queryRunner.query(`DROP TYPE "public"."fertilizer_status_enum"`);
+    await queryRunner.query(`DROP TYPE "public"."fertilizer_method_enum"`);
+    await queryRunner.query(
+      `DROP TYPE "public"."fertilizer_fertilizertype_enum"`,
+    );
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_46fd269e18704c161dfeecd60f"`,
+    );
+    await queryRunner.query(`DROP TABLE "growth_diary"`);
+    await queryRunner.query(`DROP TYPE "public"."growth_diary_mood_enum"`);
+    await queryRunner.query(`DROP TABLE "notification_logs"`);
+    await queryRunner.query(
+      `DROP TYPE "public"."notification_logs_channel_enum"`,
+    );
+    await queryRunner.query(
+      `DROP TYPE "public"."notification_logs_status_enum"`,
+    );
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_d7c44e2587f4292047c895ecb5"`,
+    );
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_1ced25315eb974b73391fb1c81"`,
+    );
+    await queryRunner.query(`DROP TABLE "notification"`);
+    await queryRunner.query(`DROP TYPE "public"."notification_type_enum"`);
+    await queryRunner.query(`DROP TABLE "reminder_options"`);
+    await queryRunner.query(
+      `DROP TYPE "public"."reminder_options_priority_enum"`,
+    );
+    await queryRunner.query(
+      `DROP TYPE "public"."reminder_options_sendmode_enum"`,
+    );
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_3d2f174ef04fb312fdebd0ddc5"`,
+    );
+    await queryRunner.query(`DROP TABLE "session"`);
+    await queryRunner.query(`DROP TABLE "water"`);
+    await queryRunner.query(`DROP TYPE "public"."water_status_enum"`);
+    await queryRunner.query(`DROP TYPE "public"."water_method_enum"`);
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_bec0f76ffa76998edd7d297aa8"`,
+    );
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_ab082df81848f48f1d1f64a9cf"`,
+    );
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_7778484944052d972e129fea87"`,
+    );
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_06daeb1e9d8c4b6ac7e6bd854e"`,
+    );
+    await queryRunner.query(`DROP TABLE "plant"`);
+    await queryRunner.query(`DROP TYPE "public"."plant_difficultylevel_enum"`);
+    await queryRunner.query(`DROP TYPE "public"."plant_sunlightneed_enum"`);
+    await queryRunner.query(`DROP TYPE "public"."plant_fertilizertype_enum"`);
+    await queryRunner.query(
+      `DROP TYPE "public"."plant_fertilizingmethod_enum"`,
+    );
+    await queryRunner.query(`DROP TYPE "public"."plant_wateringmethod_enum"`);
+    await queryRunner.query(`DROP TYPE "public"."plant_size_enum"`);
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_c4f4022812be0b878d48ca7542"`,
+    );
+    await queryRunner.query(`DROP TABLE "plant_image"`);
+    await queryRunner.query(`DROP TABLE "site"`);
+    await queryRunner.query(`DROP TYPE "public"."site_soiltype_enum"`);
+    await queryRunner.query(`DROP TYPE "public"."site_lighttype_enum"`);
+    await queryRunner.query(`DROP TYPE "public"."site_sunlight_enum"`);
+    await queryRunner.query(`DROP TABLE "template_site"`);
+    await queryRunner.query(`DROP TYPE "public"."template_site_soiltype_enum"`);
+    await queryRunner.query(
+      `DROP TYPE "public"."template_site_lighttype_enum"`,
+    );
+    await queryRunner.query(`DROP TYPE "public"."template_site_sunlight_enum"`);
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_72005e7b5fbd98db98353f74cb"`,
+    );
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_1adf701cac3b2c0f8bacb54774"`,
+    );
+    await queryRunner.query(`DROP TABLE "species"`);
+    await queryRunner.query(
+      `DROP TYPE "public"."species_difficultylevel_enum"`,
+    );
+    await queryRunner.query(`DROP TYPE "public"."species_sunlightneed_enum"`);
+    await queryRunner.query(`DROP TYPE "public"."species_fertilizertype_enum"`);
+    await queryRunner.query(
+      `DROP TYPE "public"."species_fertilizingmethod_enum"`,
+    );
+    await queryRunner.query(`DROP TYPE "public"."species_wateringmethod_enum"`);
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_f0e1b4ecdca13b177e2e3a0613"`,
+    );
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_58e4dbff0e1a32a9bdc861bb29"`,
+    );
+    await queryRunner.query(
+      `DROP INDEX "public"."IDX_9bd2fe7a8e694dedc4ec2f666f"`,
+    );
+    await queryRunner.query(`DROP TABLE "user"`);
+    await queryRunner.query(`DROP TABLE "file"`);
+    await queryRunner.query(`DROP TABLE "status"`);
+    await queryRunner.query(`DROP TABLE "role"`);
+  }
+}

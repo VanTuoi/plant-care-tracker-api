@@ -1,0 +1,176 @@
+import {
+  ForbiddenException,
+  HttpStatus,
+  Injectable,
+  UnprocessableEntityException,
+} from '@nestjs/common';
+import { SiteRepository } from './infrastructure/persistence/site.repository';
+import { Site } from './domain/site';
+import { NullableType } from '../utils/types/nullable.type';
+import { IPaginationOptions } from '../utils/types/pagination-options';
+import { FilterSiteDto, SortSiteDto } from './dto/query-site.dto';
+import { CreateSiteDto } from './dto/create-site.dto';
+import { UpdateSiteDto } from './dto/update-site.dto';
+import { UsersService } from '../users/users.service';
+import { JwtPayloadType } from '../common/types/jwt-payload.type';
+import { RoleEnum } from '../roles/roles.enum';
+import { TemplateSiteRepository } from '../template-sites/infrastructure/persistence/template-sites.repository';
+import { TemplateSiteMapper } from '../template-sites/infrastructure/persistence/relational/mappers/template-sites.mapper';
+
+@Injectable()
+export class SitesService {
+  constructor(
+    private readonly sitesRepository: SiteRepository,
+    private readonly templateSitesRepository: TemplateSiteRepository,
+    private readonly userService: UsersService,
+  ) {}
+
+  async create(
+    createSiteDto: CreateSiteDto,
+    jwt: JwtPayloadType,
+  ): Promise<Site> {
+    const userId =
+      jwt.role?.id === RoleEnum.admin && createSiteDto.userId
+        ? createSiteDto.userId
+        : jwt.id;
+
+    const user = await this.userService.findById(userId);
+    if (!user) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          user: 'userNotExists',
+        },
+      });
+    }
+
+    if (jwt.role?.id !== RoleEnum.admin && jwt.id !== user.id) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.FORBIDDEN,
+        errors: {
+          user: 'cannotCreateSiteForAnotherUser',
+        },
+      });
+    }
+
+    let siteData = { ...createSiteDto, userId: user.id };
+    if (createSiteDto.templateSiteId) {
+      const template = await this.templateSitesRepository.findById(
+        createSiteDto.templateSiteId,
+      );
+      if (!template) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: { template: 'templateNotExists' },
+        });
+      }
+
+      siteData = {
+        ...TemplateSiteMapper.toSiteBase(template),
+        ...createSiteDto,
+        userId: user.id,
+      };
+    }
+
+    return this.sitesRepository.create(siteData);
+  }
+
+  async findManyWithPagination({
+    filterOptions,
+    sortOptions,
+    paginationOptions,
+    jwt,
+  }: {
+    filterOptions?: FilterSiteDto | null;
+    sortOptions?: SortSiteDto[] | null;
+    paginationOptions: IPaginationOptions;
+    jwt: JwtPayloadType;
+  }): Promise<Site[]> {
+    if (jwt.role?.id !== RoleEnum.admin) {
+      filterOptions = {
+        ...filterOptions,
+        userId: jwt.id,
+      };
+    }
+
+    return this.sitesRepository.findManyWithPagination({
+      filterOptions,
+      sortOptions,
+      paginationOptions,
+    });
+  }
+
+  async findById(
+    id: Site['id'],
+    jwt: JwtPayloadType,
+  ): Promise<NullableType<Site>> {
+    const site = await this.sitesRepository.findById(id);
+    if (!site)
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: { sites: 'sitesNotExists' },
+      });
+
+    if (jwt.role?.id !== RoleEnum.admin && jwt.id !== site.userId) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.FORBIDDEN,
+        errors: {
+          user: 'cannotFindSiteForAnotherUser',
+        },
+      });
+    }
+
+    return site;
+  }
+
+  findByIds(ids: Site['id'][]): Promise<Site[]> {
+    return this.sitesRepository.findByIds(ids);
+  }
+
+  async update(
+    id: Site['id'],
+    updateSiteDto: UpdateSiteDto,
+    jwt: JwtPayloadType,
+  ): Promise<Site | null> {
+    const site = await this.sitesRepository.findById(id);
+    if (!site)
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: { sites: 'sitesNotExists' },
+      });
+
+    if (jwt.role?.id !== RoleEnum.admin && jwt.id !== site.userId) {
+      throw new ForbiddenException({
+        status: HttpStatus.FORBIDDEN,
+        errors: {
+          user: 'cannotUpdateSiteOfAnotherUser',
+        },
+      });
+    }
+
+    return this.sitesRepository.update(id, {
+      ...updateSiteDto,
+      userId: site.userId,
+    });
+  }
+
+  async remove(id: Site['id'], jwt: JwtPayloadType): Promise<void> {
+    const site = await this.sitesRepository.findById(id);
+    if (!site)
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: { sites: 'sitesNotExists' },
+      });
+
+    if (jwt.role?.id !== RoleEnum.admin && jwt.id !== site.userId) {
+      throw new ForbiddenException({
+        status: HttpStatus.FORBIDDEN,
+        errors: {
+          user: 'cannotDeleteSiteOfAnotherUser',
+        },
+      });
+    }
+
+    await this.sitesRepository.remove(id);
+  }
+}

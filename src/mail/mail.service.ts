@@ -4,9 +4,9 @@ import { I18nContext } from 'nestjs-i18n';
 import { MailData } from './interfaces/mail-data.interface';
 
 import { MaybeType } from '../utils/types/maybe.type';
-import { MailerService } from '../mailer/mailer.service';
 import path from 'path';
 import { AllConfigType } from '../config/config.type';
+import { MailerService } from '../mailer/mailer.service';
 
 @Injectable()
 export class MailService {
@@ -115,23 +115,7 @@ export class MailService {
         text2,
         text3,
         text4,
-        imageCid: 'logo@cid',
       },
-      attachments: [
-        {
-          filename: 'logo.png',
-          path: path.join(
-            this.configService.getOrThrow('app.workingDirectory', {
-              infer: true,
-            }),
-            'src',
-            'mail',
-            'assets',
-            'logo.png',
-          ),
-          cid: 'logo@cid',
-        },
-      ],
     });
   }
 
@@ -179,6 +163,45 @@ export class MailService {
         text1,
         text2,
         text3,
+      },
+    });
+  }
+
+  async sendPlantReminder(
+    mailData: MailData<{ plantName: string; schedule: string }>,
+  ): Promise<void> {
+    const i18n = I18nContext.current();
+
+    let reminderTitle: MaybeType<string> = 'Nhắc nhở chăm sóc cây';
+    let appName: MaybeType<string> =
+      this.configService.get('app.name', { infer: true }) ?? 'App';
+    let actionTitle: MaybeType<string> = 'Mở ứng dụng';
+
+    if (i18n) {
+      [reminderTitle, appName, actionTitle] = await Promise.all([
+        i18n.t('reminder.plantCare'),
+        i18n.t('common.appName'),
+        i18n.t('common.openApp'),
+      ]);
+    }
+
+    await this.mailerService.sendMail({
+      to: mailData.to,
+      subject: reminderTitle,
+      text: `Đã đến lúc bạn cần chăm sóc cây: ${mailData.data.plantName}. Lịch: ${mailData.data.schedule}`,
+      templatePath: path.join(
+        this.configService.getOrThrow('app.workingDirectory', { infer: true }),
+        'src',
+        'mail',
+        'mail-templates',
+        'plant-reminder.hbs',
+      ),
+      context: {
+        title: reminderTitle,
+        plantName: mailData.data.plantName,
+        schedule: mailData.data.schedule,
+        actionTitle,
+        app_name: appName,
       },
     });
   }

@@ -1,5 +1,10 @@
 {
   "markdown.extension.toc.levels": "2..6",
   "markdown.extension.orderedList.autoRenumber": false,
-  "typescript.preferences.importModuleSpecifier": "relative"
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "diffEditor.ignoreTrimWhitespace": false,
+  "editor.formatOnSave": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
