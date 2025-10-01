@@ -93,16 +93,18 @@ export class NotificationDispatcherService {
           switch (channel) {
             case Channel.EMAIL:
               if (user.email) {
-                this.logger.debug(`📧 Gửi 1 email tổng hợp tới ${user.email}`);
-                await this.mailService.sendPlantReminder({
-                  to: user.email,
-                  data: {
-                    plantName: plantsToNotify
-                      .map((p) => p.plant.name)
-                      .join(', '),
-                    schedule: 'Mỗi 3 ngày/lúc 8h sáng',
-                  },
-                });
+                this.logger.debug(
+                  `📧 Gửi 1 email tổng hợp tới (chỉ môi trường dev) ${user.email}`,
+                );
+                // await this.mailService.sendPlantReminder({
+                //   to: user.email,
+                //   data: {
+                //     plantName: plantsToNotify
+                //       .map((p) => p.plant.name)
+                //       .join(', '),
+                //     schedule: 'Mỗi 3 ngày/lúc 8h sáng',
+                //   },
+                // });
               }
               break;
 
