@@ -45,6 +45,18 @@ export class NotificationsController {
     );
   }
 
+  @ApiOkResponse({
+    type: [Notification],
+  })
+  @SerializeOptions({
+    groups: ['admin'],
+  })
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  findAll(@Req() req): Promise<Notification[]> {
+    return this.notificationsService.findAll(req.user as JwtPayloadType);
+  }
+
   @ApiOkResponse({ type: Notification })
   @SerializeOptions({ groups: ['admin'] })
   @Patch(':id')

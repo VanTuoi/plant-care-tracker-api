@@ -7,7 +7,12 @@ import {
   IsDate,
   IsEnum,
 } from 'class-validator';
-import { FertilizerMethodEnum, FertilizerTypeEnum } from '../fertilizers.enum';
+import {
+  FertilizerMethodEnum,
+  FertilizerStatusEnum,
+  FertilizerTypeEnum,
+} from '../fertilizers.enum';
+import { Plant } from '../../plants/domain/plant';
 
 export class Fertilizer {
   @ApiProperty({
@@ -49,6 +54,15 @@ export class Fertilizer {
   method: FertilizerMethodEnum;
 
   @ApiProperty({
+    description: 'Trạng thái của bản ghi bón phân (lịch/bón thật)',
+    enum: FertilizerStatusEnum,
+    example: FertilizerStatusEnum.SCHEDULED,
+    default: FertilizerStatusEnum.SCHEDULED,
+  })
+  @IsEnum(FertilizerStatusEnum)
+  status: FertilizerStatusEnum = FertilizerStatusEnum.SCHEDULED;
+
+  @ApiProperty({
     description: 'Thời gian tạo bản ghi',
     example: '2025-09-02T08:30:00Z',
   })
@@ -62,10 +76,10 @@ export class Fertilizer {
   @IsDate()
   updatedAt: Date;
 
-  @ApiProperty({
-    description: 'ID của cây được bón phân',
-    example: 'uuid',
+  @ApiPropertyOptional({
+    description: 'Thuộc về cây',
+    type: () => Plant,
   })
-  @IsUUID()
-  plantId: string;
+  @IsOptional()
+  plant?: Plant;
 }

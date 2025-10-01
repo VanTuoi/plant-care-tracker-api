@@ -1,8 +1,11 @@
+import { WatersService } from './../waters/waters.service';
+import { WateringDecisionService } from './../waters/domain/services/watering-decision.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { ReminderOptionRepository } from '../reminder-options/infrastructure/persistence/reminder-option.repository';
 import { PlantRepository } from '../plants/infrastructure/persistence/plants.repository';
 import { UserRepository } from '../users/infrastructure/persistence/user.repository';
 import { NotificationLogsService } from '../notification-logs/notification-logs.service';
+import { WaterRepository } from '../waters/infrastructure/persistence/water.repository';
 
 import { Channel } from '../reminder-options/reminder-options.enum';
 import { NotificationChannelStatus } from '../notification-logs/notification-logs.enum';
@@ -12,6 +15,8 @@ import { WebsocketGateway } from '../websockets/websockets.gateway';
 import { MailService } from '../mail/mail.service';
 import { Plant } from '../plants/domain/plant';
 import { Notification } from '../notifications/domain/notification';
+import { Cron } from '@nestjs/schedule';
+import { WaterEnum, WaterStatusEnum } from '../waters/waters.enum';
 
 @Injectable()
 export class NotificationDispatcherService {
@@ -21,12 +26,16 @@ export class NotificationDispatcherService {
     private readonly reminderOptionRepo: ReminderOptionRepository,
     private readonly plantRepo: PlantRepository,
     private readonly userRepo: UserRepository,
+    private readonly waterRepo: WaterRepository,
+    private readonly watersService: WatersService,
     private readonly notificationLogsService: NotificationLogsService,
+    private readonly wateringDecisionService: WateringDecisionService,
     private readonly notificationsService: NotificationsService,
     private readonly mailService: MailService,
     private readonly websocketGateway: WebsocketGateway,
   ) {}
 
+  @Cron('*/1 * * * *')
   async dispatchNotifications(): Promise<void> {
     const reminderOptions = await this.reminderOptionRepo.findAllActive();
 
@@ -39,22 +48,42 @@ export class NotificationDispatcherService {
       const plantsToNotify: { plant: Plant; notification: Notification }[] = [];
 
       for (const plant of plants) {
-        if (!this.shouldNotify()) continue;
+        const history = await this.waterRepo.findByPlantIds([plant.id]);
+        const shouldNotify = this.wateringDecisionService.shouldNotify(
+          plant,
+          plant.site,
+          history,
+        );
 
-        const notification = await this.notificationsService.createInternal({
-          userId: user.id,
-          plantId: plant.id,
-          isRead: false,
-          url: '',
-          title: `Nhắc nhở chăm sóc cây ${plant.name}`,
-          type: NotificationTypeEnum.REMINDER,
-          payload: JSON.stringify({
-            reminderOptionId: option.id,
-            plantName: plant.name,
-          }),
-        });
+        const hasScheduled = history.some(
+          (w) => w.status === WaterStatusEnum.SCHEDULED,
+        );
+        if (hasScheduled) continue;
 
-        plantsToNotify.push({ plant, notification });
+        if (shouldNotify) {
+          await this.watersService.createInternal({
+            plantId: plant.id,
+            amount: plant.wateringAmount ?? 200,
+            method: plant.wateringMethod ?? WaterEnum.ROOT,
+            note: 'Auto',
+            status: WaterStatusEnum.SCHEDULED,
+          });
+
+          const notification = await this.notificationsService.createInternal({
+            userId: user.id,
+            plantId: plant.id,
+            isRead: false,
+            url: '',
+            title: `Đến giờ tưới cây ${plant.name}`,
+            type: NotificationTypeEnum.WATERING,
+            payload: JSON.stringify({
+              reminderOptionId: option.id,
+              plantName: plant.name,
+            }),
+          });
+
+          plantsToNotify.push({ plant, notification });
+        }
       }
 
       if (plantsToNotify.length === 0) continue;
@@ -111,7 +140,7 @@ export class NotificationDispatcherService {
     }
   }
 
-  private shouldNotify(): boolean {
+  private shouldNotifyWatering(): boolean {
     // logic check
     return true;
   }

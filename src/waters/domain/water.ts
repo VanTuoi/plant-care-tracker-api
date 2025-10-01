@@ -7,7 +7,8 @@ import {
   IsDate,
   IsEnum,
 } from 'class-validator';
-import { WaterEnum } from '../waters.enum';
+import { WaterEnum, WaterStatusEnum } from '../waters.enum';
+import { Plant } from '../../plants/domain/plant';
 
 export class Water {
   @ApiProperty({
@@ -41,6 +42,15 @@ export class Water {
   method: WaterEnum;
 
   @ApiProperty({
+    description: 'Trạng thái của bản ghi tưới (lịch/tưới thật)',
+    enum: WaterStatusEnum,
+    example: WaterStatusEnum.SCHEDULED,
+    default: WaterStatusEnum.SCHEDULED,
+  })
+  @IsEnum(WaterStatusEnum)
+  status: WaterStatusEnum = WaterStatusEnum.SCHEDULED;
+
+  @ApiProperty({
     description: 'Thời gian tạo bản ghi',
     example: '2025-09-01T08:30:00Z',
   })
@@ -54,10 +64,10 @@ export class Water {
   @IsDate()
   updatedAt: Date;
 
-  @ApiProperty({
-    description: 'ID của cây được tưới',
-    example: 'uuid',
+  @ApiPropertyOptional({
+    description: 'Thuộc về cây',
+    type: () => Plant,
   })
-  @IsUUID()
-  plantId: string;
+  @IsOptional()
+  plant?: Plant;
 }

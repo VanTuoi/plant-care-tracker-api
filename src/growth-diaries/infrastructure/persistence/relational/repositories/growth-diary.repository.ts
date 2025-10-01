@@ -24,9 +24,13 @@ export class GrowthDiaryRelationalRepository implements GrowthDiaryRepository {
   }
 
   async getAll(): Promise<GrowthDiary[]> {
-    const entities = await this.repo.find({
-      order: { createdAt: 'ASC' },
-    });
+    const entities = await this.repo
+      .createQueryBuilder('diary')
+      .innerJoinAndSelect('diary.plant', 'plant', 'plant.deletedAt IS NULL')
+      .leftJoinAndSelect('diary.file', 'file')
+      .orderBy('diary.createdAt', 'DESC')
+      .getMany();
+
     return entities.map(GrowthDiaryMapper.toDomain);
   }
 

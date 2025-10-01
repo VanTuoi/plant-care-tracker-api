@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsUUID, IsString, IsOptional, IsEnum } from 'class-validator';
 import { Mood } from '../growth-diaries.enum';
+import { FileType } from '../../files/domain/file';
 
 export class GrowthDiary {
   @ApiProperty({
@@ -18,13 +19,12 @@ export class GrowthDiary {
   @IsUUID()
   plantId: string;
 
-  @ApiProperty({
-    description: 'ID file đính kèm (nếu có)',
-    example: 'uuid',
+  @ApiPropertyOptional({
+    description: 'File đính kèm (nếu có)',
+    type: () => FileType,
   })
-  @IsUUID()
   @IsOptional()
-  fileId?: string;
+  file?: FileType;
 
   @ApiPropertyOptional({
     description: 'Ghi chú',

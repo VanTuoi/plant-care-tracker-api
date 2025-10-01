@@ -9,6 +9,7 @@ import {
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 import {
   FertilizerMethodEnum,
+  FertilizerStatusEnum,
   FertilizerTypeEnum,
 } from '../../../../fertilizers.enum';
 import { PlantEntity } from '../../../../../plants/infrastructure/persistence/relational/entities/plants.entity';
@@ -35,6 +36,13 @@ export class FertilizerEntity extends EntityRelationalHelper {
     enum: FertilizerMethodEnum,
   })
   method: FertilizerMethodEnum;
+
+  @Column({
+    type: 'enum',
+    enum: FertilizerStatusEnum,
+    default: FertilizerStatusEnum.SCHEDULED,
+  })
+  status: FertilizerStatusEnum;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;

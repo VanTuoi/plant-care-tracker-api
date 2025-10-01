@@ -6,7 +6,7 @@ import {
   IsNumber,
   IsEnum,
 } from 'class-validator';
-import { WaterEnum } from '../waters.enum';
+import { WaterEnum, WaterStatusEnum } from '../waters.enum';
 
 export class CreateWaterDto {
   @ApiPropertyOptional({
@@ -31,6 +31,15 @@ export class CreateWaterDto {
   })
   @IsEnum(WaterEnum)
   method: WaterEnum;
+
+  @ApiProperty({
+    description: 'Trạng thái của bản ghi tưới (lịch/tưới thật)',
+    enum: WaterStatusEnum,
+    example: WaterStatusEnum.SCHEDULED,
+    default: WaterStatusEnum.SCHEDULED,
+  })
+  @IsEnum(WaterStatusEnum)
+  status: WaterStatusEnum = WaterStatusEnum.SCHEDULED;
 
   @ApiProperty({
     description: 'ID của cây được tưới',

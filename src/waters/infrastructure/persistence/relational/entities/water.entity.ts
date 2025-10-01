@@ -7,7 +7,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
-import { WaterEnum } from '../../../../waters.enum';
+import { WaterEnum, WaterStatusEnum } from '../../../../waters.enum';
 import { PlantEntity } from '../../../../../plants/infrastructure/persistence/relational/entities/plants.entity';
 
 @Entity('water')
@@ -23,6 +23,13 @@ export class WaterEntity extends EntityRelationalHelper {
 
   @Column({ type: 'enum', enum: WaterEnum })
   method: WaterEnum;
+
+  @Column({
+    type: 'enum',
+    enum: WaterStatusEnum,
+    default: WaterStatusEnum.SCHEDULED,
+  })
+  status: WaterStatusEnum;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;

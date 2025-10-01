@@ -9,6 +9,8 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { RedisPubSubService } from '../websockets/redis-pubsub.service';
 import { MailModule } from '../mail/mail.module';
 import { NotificationDispatcherController } from './notifier.controller';
+import { WatersModule } from '../waters/waters.module';
+import { FertilizersModule } from '../fertilizers/fertilizers.module';
 
 const controllers =
   process.env.NODE_ENV === 'development'
@@ -21,6 +23,8 @@ const controllers =
     WsModule,
     ReminderOptionsModule,
     PlantsModule,
+    WatersModule,
+    FertilizersModule,
     UsersModule,
     NotificationLogsModule,
     NotificationsModule,

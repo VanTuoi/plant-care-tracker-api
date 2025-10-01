@@ -12,6 +12,7 @@ import { WaterRepository } from './infrastructure/persistence/water.repository';
 import { JwtPayloadType } from '../common/types/jwt-payload.type';
 import { RoleEnum } from '../roles/roles.enum';
 import { PlantRepository } from '../plants/infrastructure/persistence/plants.repository';
+import { Plant } from '../plants/domain/plant';
 
 @Injectable()
 export class WatersService {
@@ -35,8 +36,34 @@ export class WatersService {
         errors: { user: 'cannotCreateWaterForPlantOfAnotherUser' },
       });
     }
+    const water = new Water();
+    water.note = dto.note;
+    water.amount = dto.amount;
+    water.method = dto.method;
+    water.status = dto.status;
 
-    return this.waterRepository.create(dto);
+    water.plant = { id: dto.plantId } as Plant;
+
+    return this.waterRepository.create(water);
+  }
+
+  async createInternal(dto: CreateWaterDto): Promise<Water> {
+    const plant = await this.plantRepository.findById(dto.plantId);
+    if (!plant) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: { plant: 'plantNotExists' },
+      });
+    }
+
+    const water = new Water();
+    water.note = dto.note;
+    water.amount = dto.amount;
+    water.method = dto.method;
+    water.status = dto.status;
+    water.plant = { id: dto.plantId } as Plant;
+
+    return this.waterRepository.create(water);
   }
 
   async findAll(jwt: JwtPayloadType): Promise<Water[]> {
@@ -55,9 +82,9 @@ export class WatersService {
     jwt: JwtPayloadType,
   ): Promise<NullableType<Water>> {
     const water = await this.waterRepository.findById(id);
-    if (!water) return null;
+    if (!water || !water.plant?.id) return null;
 
-    const plant = await this.plantRepository.findById(water.plantId);
+    const plant = await this.plantRepository.findById(water.plant?.id);
     if (!plant) return null;
 
     if (jwt.role?.id !== RoleEnum.admin && jwt.id !== plant.userId) {
@@ -76,13 +103,13 @@ export class WatersService {
     jwt: JwtPayloadType,
   ): Promise<Water | null> {
     const water = await this.waterRepository.findById(id);
-    if (!water)
+    if (!water || !water.plant?.id)
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: { water: 'waterNotExists' },
       });
 
-    const plant = await this.plantRepository.findById(water.plantId);
+    const plant = await this.plantRepository.findById(water.plant?.id);
     if (!plant) return null;
 
     if (jwt.role?.id !== RoleEnum.admin && jwt.id !== plant.userId) {

@@ -9,7 +9,7 @@ export class GrowthDiaryMapper {
     domain.id = raw.id;
     domain.plantId = raw.plantId || raw.plant?.id;
 
-    domain.fileId = raw.fileId;
+    domain.file = raw.file;
     domain.note = raw.note;
     domain.mood = raw.mood;
     domain.createdAt = raw.createdAt;
@@ -30,10 +30,9 @@ export class GrowthDiaryMapper {
     plant.id = domain.plantId;
     entity.plant = plant;
 
-    entity.fileId = domain.fileId;
-    if (domain.fileId) {
+    if (domain.file) {
       const file = new FileEntity();
-      file.id = domain.fileId;
+      file.id = domain.file.id;
       entity.file = file;
     }
 

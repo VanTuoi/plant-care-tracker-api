@@ -41,8 +41,8 @@ export class GrowthDiariesService {
       });
     }
 
-    if (data.fileId) {
-      const file = await this.filesService.findById(data.fileId);
+    if (data.file) {
+      const file = await this.filesService.findById(data.file.id);
       if (!file) {
         throw new UnprocessableEntityException({
           status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -51,7 +51,7 @@ export class GrowthDiariesService {
       }
 
       const existingDiaryWithFile =
-        await this.growthDiaryRepository.findByFileId(data.fileId);
+        await this.growthDiaryRepository.findByFileId(data.file.id);
       if (existingDiaryWithFile) {
         throw new UnprocessableEntityException({
           status: HttpStatus.UNPROCESSABLE_ENTITY,

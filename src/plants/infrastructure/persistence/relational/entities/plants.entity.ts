@@ -123,7 +123,7 @@ export class PlantEntity extends EntityRelationalHelper {
   @Index()
   user?: UserEntity;
 
-  @ManyToOne(() => SiteEntity, { eager: true })
+  @ManyToOne(() => SiteEntity, { eager: true, onDelete: 'CASCADE' })
   @Index()
   site?: SiteEntity;
 }

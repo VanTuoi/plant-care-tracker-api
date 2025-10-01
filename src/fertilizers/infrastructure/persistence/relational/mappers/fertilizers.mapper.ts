@@ -10,9 +10,10 @@ export class FertilizerMapper {
     domainEntity.fertilizerType = raw.fertilizerType;
     domainEntity.amount = raw.amount;
     domainEntity.method = raw.method;
+    domainEntity.status = raw.status;
     domainEntity.createdAt = raw.createdAt;
     domainEntity.updatedAt = raw.updatedAt;
-    domainEntity.plantId = raw.plant?.id;
+    domainEntity.plant = raw.plant;
 
     return domainEntity;
   }
@@ -28,10 +29,11 @@ export class FertilizerMapper {
     persistenceEntity.fertilizerType = domainEntity.fertilizerType;
     persistenceEntity.amount = domainEntity.amount;
     persistenceEntity.method = domainEntity.method;
+    persistenceEntity.status = domainEntity.status;
 
-    if (domainEntity.plantId) {
+    if (domainEntity.plant?.id) {
       const plantEntity = new PlantEntity();
-      plantEntity.id = domainEntity.plantId;
+      plantEntity.id = domainEntity.plant.id;
       persistenceEntity.plant = plantEntity;
     }
 

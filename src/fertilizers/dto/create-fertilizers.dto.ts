@@ -6,7 +6,11 @@ import {
   IsNumber,
   IsEnum,
 } from 'class-validator';
-import { FertilizerMethodEnum, FertilizerTypeEnum } from '../fertilizers.enum';
+import {
+  FertilizerMethodEnum,
+  FertilizerStatusEnum,
+  FertilizerTypeEnum,
+} from '../fertilizers.enum';
 
 export class CreateFertilizerDto {
   @ApiPropertyOptional({
@@ -39,6 +43,15 @@ export class CreateFertilizerDto {
   })
   @IsEnum(FertilizerMethodEnum)
   method: FertilizerMethodEnum;
+
+  @ApiProperty({
+    description: 'Trạng thái của bản ghi bón phân (lịch/bón thật)',
+    enum: FertilizerStatusEnum,
+    example: FertilizerStatusEnum.SCHEDULED,
+    default: FertilizerStatusEnum.SCHEDULED,
+  })
+  @IsEnum(FertilizerStatusEnum)
+  status: FertilizerStatusEnum = FertilizerStatusEnum.SCHEDULED;
 
   @ApiProperty({
     description: 'ID của cây được bón phân',
